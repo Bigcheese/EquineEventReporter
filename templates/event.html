@@ -1,0 +1,15 @@
+<h2>{{model.event.name}}</h2>
+<div>
+  <h3>Players</h3>
+  <ul id="players">
+    <li
+        ng-repeat="player in model.event.players">{{player.name}} <button class="delete" /></li>
+  </ul>
+  <h3>Matches</h3>
+  <div class="list-group">
+    <span class="list-group-item"
+          ng-repeat="match in model.event.matches">
+      Round: {{match.round}} - {{match.players[0]}} vs. {{match.players[1]}}
+    </span>
+  </div>
+</div>
