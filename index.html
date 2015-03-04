@@ -37,12 +37,15 @@
       <div class="row">
         <div ng-controller="SidebarCtrl" class="col-sm-3 col-md-2 sidebar">
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="#events">Events</a></li>
-            <li ng-repeat="sub in sidebar.subs"><a href="{{sub.href}}">{{sub.name}}</a></li>
+            <li><a ui-sref="events">Events</a></li>
+            <li ng-repeat="sub in $state.current.data.sidebar">
+              <a ui-sref="{{sub.location}}" ui-sref-active="active">{{sub.name}}</a>
+            </li>
           </ul>
         </div>
       </div>
-      <div ui-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">    
+      <div ui-view class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <span>Loading...</span>
       </div>
     </div>
 
@@ -54,5 +57,7 @@
     <script src="js/libs/angular.js"></script>
     <script src="js/libs/angular-ui-router.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/EventData.js"></script>
+    <script src="js/swiss.js"></script>
   </body>
 </html>

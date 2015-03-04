@@ -17,47 +17,38 @@ var app = angular.module('eer', ['ui.router'])
         .state('event', {
           url: "/event/{id}",
           templateUrl: "templates/event.html",
-          controller: 'EventCtrl'
+          controller: 'EventCtrl',
+          data: {
+            sidebar: [{name: "Players", location: 'event.players'},
+                      {name: "Matches", location: 'event.matches'}]
+          }
+        })
+        .state('event.players', {
+          url: "/players",
+          templateUrl: "templates/event.players.html"
+        })
+        .state('event.matches', {
+          url: "/matches",
+          templateUrl: "templates/event.matches.html"
         })
     }
   ])
-  .factory('EventData', function() {
-    var EventData = [
-    {
-      name: 'Tournament 1',
-      players: [{name: "Bigchese"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}, {name: "Aracat"}],
-      done: false,
-      matches: [{
-        round: 0,
-        players: ['Bigcheese', 'Aracat'],
-        games: [{}],
-        winner: null
-      }]
-    },
-    {
-      name: 'Tournament 2'
-    },
-    {
-      name: 'THE BIG ONE'
-    }
-    ]
-    return EventData
-  })
-  .factory('Sidebar', function() {
-    var SidebarData = {subs: [{href: "#adena", name: "adena"}]}
-    return SidebarData
-  })
-  .controller('SidebarCtrl', ['$scope', 'Sidebar', function($scope, Sidebar) {
-    $scope.sidebar = Sidebar
+  .controller('SidebarCtrl', ['$scope', function($scope) {
   }])
   .controller('EventsCtrl', ['$scope', 'EventData', function($scope, EventData) {
   	$scope.model = {
-  		events: EventData
+  		events: EventData.data.events
   	}
   }])
-  .controller('EventCtrl', ['$scope', 'EventData',
-  function($scope, EventData) {
-    $scope.model = {
-      'event': EventData[0]
+  .controller('EventCtrl', ['$scope', 'EventData', 'swiss',
+    function($scope, EventData, swiss) {
+      $scope.model = {
+        matches_filter: null,
+        'swiss': swiss,
+        'data': EventData,
+        'event': $.grep(EventData.data.events, function (e) {
+          return e.id === $scope.$stateParams.id
+        })[0]
+      }
     }
-  }])
+  ])

@@ -1,0 +1,11 @@
+<h3>Players</h3>
+<ul id="players" class="list-group">
+  <li class="list-group-item" ng-repeat="player in model.data.players(model.event)">
+    {{model.swiss.winLossTie(player)}} {{player.name}}
+    <span class="btn-group pull-right">
+      <button type="button" class="btn btn-default">Paid</button>
+      <button type="button" class="btn btn-default">Dropped</button>
+      <button type="button" class="btn btn-default">✖</button>
+    </span>
+  </li>
+</ul>

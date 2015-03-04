@@ -1,5 +1,5 @@
 <h1 class="page-header">Events</h1>
 <div class="list-group">
   <a class="list-group-item"
-     ng-repeat="event in model.events" href="#/event/{{event.name}}">{{event.name}}</a>
+     ng-repeat="event in model.events" ui-sref="event({id:event.id})">{{event.name}}</a>
 </div>

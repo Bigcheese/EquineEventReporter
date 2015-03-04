@@ -31,10 +31,8 @@ body {
   }
 }
 
-#players  {
-  -webkit-column-width: 8em;
-  -moz-column-width: 8em;
-  column-width: 8em;
+#matches > span {
+  padding: 3px 15px;
 }
 
 button {
@@ -53,8 +51,15 @@ button {
   appearance: none;
 }
 
+#matches-hdr {
+  padding: 10px 0px;
+}
+
+#players button {
+  padding: 1px 5px;
+}
+
 #players > li .delete {
-  display: none;
   font-size: 15px;
   color: #a88a8a;
 }
@@ -69,8 +74,7 @@ button {
 }
 
 #players > li .delete:hover {
-  text-shadow: 0 0 1px #000,
-               0 0 10px rgba(199, 107, 107, 0.8);
+
 }
 
 /* Sidebar navigation */
