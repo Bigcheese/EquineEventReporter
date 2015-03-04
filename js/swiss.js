@@ -57,17 +57,6 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
       var wlt = this.winLossTie(player);
       return (wlt[0] * 3) + wlt[2];
     },
-    test: function() {
-      var graph = [
-        [1],
-        [2, 3],
-        [],
-        [4],
-        [5],
-        [3, 2]
-      ];
-      return edmons.maxMatching(graph);
-    },
     pair: function(event) {
       event.current_round++
       var players = EventData.players(event)
