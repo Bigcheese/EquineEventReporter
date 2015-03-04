@@ -7,7 +7,7 @@ app.factory('EventData', function() {
           name: "Tournament 1",
           type: "swiss",
           players: ["player.398ruw3", "player.4fis93kd"],
-          current_round: 1,
+          current_round: 0,
           done: false
         }
       ],
@@ -53,26 +53,7 @@ app.factory('EventData', function() {
           warning_count: 0
         }
       ],
-      matches: [
-        {
-          id: "match.309f3",
-          event: "event.w4yfhwo874f",
-          round: 1,
-          players: ["player.398ruw3", "player.4fis93kd"],
-          games: [{winner: "player.398ruw3"}],
-          winner: "player.398ruw3",
-          time_extension: 0
-        },
-        {
-          id: "match.309f3",
-          event: "event.w4yfhwo874f",
-          round: 2,
-          players: ["player.398ruw3", "player.4fis93kd"],
-          games: [{winner: "player.398ruw3"}],
-          winner: "player.4fis93kd",
-          time_extension: 0
-        }
-      ]
+      matches: []
     },
     players: function(event) {
       var playerIds = event.players

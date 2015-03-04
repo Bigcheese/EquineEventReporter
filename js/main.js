@@ -1,4 +1,4 @@
-var app = angular.module('eer', ['ui.router'])
+var app = angular.module('eer', ['ui.router', 'edmons'])
   .run([     '$rootScope', '$state', '$stateParams',
     function ($rootScope,   $state,   $stateParams) {
       // Make $state and $stateParams available everywhere.

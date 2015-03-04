@@ -1,3 +1,4 @@
+(function() {
 function uuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
@@ -24,85 +25,174 @@ function shuffle(array) {
   return array;
 }
 
-function stableSort(arr, cmpFunc) {
-    //wrap the arr elements in wrapper objects, so we can associate them with their origional starting index position
-    var arrOfWrapper = arr.map(function(elem, idx){
-        return {elem: elem, idx: idx};
-    });
-
-    //sort the wrappers, breaking sorting ties by using their elements orig index position
-    arrOfWrapper.sort(function(wrapperA, wrapperB){
-        var cmpDiff = cmpFunc(wrapperA.elem, wrapperB.elem);
-        return cmpDiff === 0 
-             ? wrapperA.idx - wrapperB.idx
-             : cmpDiff;
-    });
-
-    //unwrap and return the elements
-    return arrOfWrapper.map(function(wrapper){
-        return wrapper.elem;
-    });
+function fill(array, val) {
+  for (var i = 0; i < array.length; ++i)
+    array[i] = val;
 }
 
-function paired(array) {
-  if (array.length >= 2)
-    return [[array[0], array[1]]].concat(paired(array.slice(2)))
-  else if (array.length === 1)
-    return [[array[0], null]]
-  else
-    return []
-}
-
-app.factory('swiss', ['EventData', function(EventData) {
+app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
   return {
+    playerMatches: function(player) {
+      return $.grep(EventData.data.matches, function(match) {
+        return match.players.indexOf(player.id) != -1;
+      });
+    },
     winLossTie: function(player) {
-      var matches = $.grep(EventData.data.matches, function(match) {
-        return match.players.indexOf(player.id) != -1
-      })
+      var matches = this.playerMatches(player);
       return [
         $.grep(matches, function(match) {
-          return match.winner === player.id
+          return match.winner === player.id;
         }).length,
         $.grep(matches, function(match) {
-          return match.winner != player.id && match.winner != "tie"
+          return match.winner != player.id &&
+                 match.winner != null &&
+                 match.winner != "tie";
         }).length,
         $.grep(matches, function(match) {
-          match.winner === "tie"
+          return match.winner === "tie";
         }).length
-      ]
+      ];
     },
     matchPoints: function(player) {
-      var wlt = this.winLossTie(player)
-      return (wlt[0] * 3) + wlt[2]
+      var wlt = this.winLossTie(player);
+      return (wlt[0] * 3) + wlt[2];
+    },
+    test: function() {
+      var graph = [
+        [1],
+        [2, 3],
+        [],
+        [4],
+        [5],
+        [3, 2]
+      ];
+      return edmons.maxMatching(graph);
     },
     pair: function(event) {
       event.current_round++
       var players = EventData.players(event)
       var ranked_players = []
       for (var i in players) {
-        ranked_players.push({
-          points: this.winLossTie(players[i])[0],
-          player: players[i]
-        })
+        if (!players[i].dropped)
+          ranked_players.push({
+            points: this.matchPoints(players[i]),
+            player: players[i]
+          });
       }
 
-      shuffle(ranked_players)
-      ranked_players = stableSort(ranked_players, function(a, b) {
-        return b.points - a.points
-      })
+      // Add a bye if we have an odd number of players.
+      if (ranked_players.length % 2 === 1) {
+        ranked_players.push({
+          points: 0,
+          player: {
+            id: "bye"
+          }
+        });
+      }
 
-      var match_pairs = paired(ranked_players)
+      shuffle(ranked_players);
+
+      // Group by rank.
+      var groups = {};
+      for (var i = 0; i < ranked_players.length; ++i) {
+        if (!(ranked_players[i].points in groups))
+          groups[ranked_players[i].points] = [];
+        groups[ranked_players[i].points].push(ranked_players[i]);
+      }
+
+      var groupIndex = []
+      for (var i in groups) {
+        groupIndex.push({points: i, players: groups[i]});
+      }
+
+      groupIndex.sort(function(a, b) {
+        return b.points - a.points;
+      });
+
+      // Build who has played who map.
+      var matches = EventData.matches(event);
+      var playerIdToOpponents = {}
+      for (var i = 0; i < ranked_players.length; ++i)
+        playerIdToOpponents[ranked_players[i].player.id] = {}
+      for (var i in matches) {
+        var m = matches[i];
+        var player1 = m.players[0];
+        var player2 = m.players[1];
+        if (player2 === null)
+          player2 = "bye";
+        playerIdToOpponents[player1][player2] = true;
+        playerIdToOpponents[player2][player1] = true;
+      }
+
+      var match_pairs = [];
+
+      // Pair groups using max matching.
+      for (var i = 0; i < groupIndex.length; ++i) {
+        // Convert to graph format.
+        var playerToIndex = {};
+        var indexToPlayer = {};
+        var players = groupIndex[i].players;
+
+        for (var j = 0; j < players.length; ++j) {
+          var player = players[j].player;
+          playerToIndex[player.id] = j;
+          indexToPlayer[j] = player;
+        }
+
+        var graph = new Array(players.length);
+        for (var j = 0; j < graph.length; ++j)
+          graph[j] = [];
+
+        for (var j = 0; j < players.length; ++j) {
+          var player = players[j].player;
+          for (var k = 0; k < players.length; ++k) {
+            var opponent = players[k].player;
+            if (opponent === player)
+              continue;
+            if (opponent.id in playerIdToOpponents[player.id])
+              continue;
+            graph[playerToIndex[player.id]].push(playerToIndex[opponent.id]);
+          }
+        }
+
+        var matchings = edmons.maxMatching(graph);
+
+        // Only pair each player once.
+        var paired = {};
+        for (var j in matchings) {
+          var m0 = matchings[j][0];
+          var m1 = matchings[j][1];
+          if (m0 in paired || m1 in paired)
+            continue;
+          paired[m0] = true;
+          paired[m1] = true;
+          match_pairs.push([indexToPlayer[m0], indexToPlayer[m1]]);
+          delete indexToPlayer[m0];
+          delete indexToPlayer[m1];
+        }
+
+        // Pair down the remaining player if we had an odd number of players.
+        for (var j in indexToPlayer) {
+          if (groupIndex[i + 1] === undefined)
+            return;
+          groupIndex[i + 1].players.unshift({points: null, player: indexToPlayer[j]});
+        }
+      }
 
       for (var i in match_pairs) {
+        // Bye always is 2nd player.
+        if (match_pairs[i][0].id === "bye")
+          match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];
         EventData.data.matches.push({
           id: "match." + uuid(),
           event: event.id,
           round: event.current_round,
-          players: [match_pairs[i][0].player.id, match_pairs[i][1] ? match_pairs[i][1].player.id : null],
+          players: [match_pairs[i][0].id, match_pairs[i][1].id !== "bye" ? match_pairs[i][1].id : null],
           games: [],
-          winner: match_pairs[i][1] ? null : match_pairs[i][0].player.id
-        })
+          winner: match_pairs[i][1].id !== "bye" ? null : match_pairs[i][0].id
+        });
       }
     }
-  }
-}])
+  };
+}]);
+})();
