@@ -60,7 +60,7 @@ var app = angular.module('eer', ['ui.router', 'edmons'])
       $scope.addPlayer = function() {
         if (this.name) {
           EventData.data.players.push({
-            id: "player." + uuid(),
+            _id: "player." + uuid(),
             name: this.name
           });
           this.name = "";

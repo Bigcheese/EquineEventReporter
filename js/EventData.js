@@ -3,7 +3,7 @@ app.factory('EventData', function() {
     data: {
       events: [
         {
-          id: "event.w4yfhwo874f",
+          _id: "event.w4yfhwo874f",
           name: "Tournament 1",
           type: "swiss",
           players: ["player.398ruw3", "player.4fis93kd"],
@@ -13,7 +13,7 @@ app.factory('EventData', function() {
       ],
       players: [
         {
-          id: "player.398ruw3",
+          _id: "player.398ruw3",
           name: "Bigcheese",
           deck: "",
           paid: true,
@@ -21,7 +21,7 @@ app.factory('EventData', function() {
           warning_count: 0
         },
         {
-          id: "player.4fis93kd",
+          _id: "player.4fis93kd",
           name: "Aracat",
           deck: "",
           paid: true,
@@ -29,7 +29,7 @@ app.factory('EventData', function() {
           warning_count: 0
         },
        {
-          id: "player.4fie93kd",
+          _id: "player.4fie93kd",
           name: "Bugle",
           deck: "",
           paid: true,
@@ -37,7 +37,7 @@ app.factory('EventData', function() {
           warning_count: 0
         },
         {
-          id: "player.4fdfis93kd",
+          _id: "player.4fdfis93kd",
           name: "Gippy",
           deck: "",
           paid: true,
@@ -45,7 +45,7 @@ app.factory('EventData', function() {
           warning_count: 0
         },
         {
-          id: "player.4fis9sef3kd",
+          _id: "player.4fis9sef3kd",
           name: "TCO",
           deck: "",
           paid: true,
@@ -60,7 +60,7 @@ app.factory('EventData', function() {
       var ret = []
       for (i in this.data.players) {
         var player = this.data.players[i]
-        if ($.inArray(player.id, playerIds.some)) {
+        if ($.inArray(player._id, playerIds.some)) {
           ret.push(player)
         }
       }
@@ -68,12 +68,12 @@ app.factory('EventData', function() {
     },
     matches: function(event) {
       return $.grep(this.data.matches, function(match) {
-        return match.event === event.id
+        return match.event === event._id
       })
     },
     player: function(playerId) {
       return $.grep(this.data.players, function(player) {
-        return player.id === playerId
+        return player._id === playerId
       })[0]
     },
   }
