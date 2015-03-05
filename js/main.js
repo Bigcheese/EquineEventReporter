@@ -42,13 +42,32 @@ var app = angular.module('eer', ['ui.router', 'edmons'])
   ])
   .controller('SidebarCtrl', ['$scope', function($scope) {
   }])
+  .factory('alertsManager', function() {
+    return {
+      alerts: [],
+      
+      addAlert: function(message) {
+        this.alerts.push(message);
+      },
+
+      closeAlert: function(index) {
+        this.alerts.splice(index, 1);
+      }
+    };
+  })
+  .controller('AlertCtrl',
+         ['$scope', 'alertsManager',
+  function($scope,   alertsManager) {
+    $scope.alerts = alertsManager.alerts;
+    $scope.closeAlert = alertsManager.closeAlert;
+  }])
   .controller('EventsCtrl', ['$scope', 'EventData', function($scope, EventData) {
   	$scope.model = {
   		events: EventData.data.events
   	}
   }])
-  .controller('EventCtrl', ['$scope', 'EventData', 'swiss',
-    function($scope, EventData, swiss) {
+  .controller('EventCtrl', ['$scope', '$http', 'alertsManager', 'EventData', 'swiss',
+    function($scope, $http, alertsManager, EventData, swiss) {
       $scope.model = {
         matches_filter: null,
         'swiss': swiss,
