@@ -1,3 +1,10 @@
+function uuid() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
 var app = angular.module('eer', ['ui.router', 'edmons'])
   .run([     '$rootScope', '$state', '$stateParams',
     function ($rootScope,   $state,   $stateParams) {
@@ -49,6 +56,15 @@ var app = angular.module('eer', ['ui.router', 'edmons'])
         'event': $.grep(EventData.data.events, function (e) {
           return e.id === $scope.$stateParams.id
         })[0]
-      }
+      };
+      $scope.addPlayer = function() {
+        if (this.name) {
+          EventData.data.players.push({
+            id: "player." + uuid(),
+            name: this.name
+          });
+          this.name = "";
+        }
+      };
     }
   ])
