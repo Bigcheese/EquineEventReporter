@@ -73,7 +73,7 @@ var app = angular.module('eer', ['ui.router', 'edmons'])
         'swiss': swiss,
         'data': EventData,
         'event': $.grep(EventData.data.events, function (e) {
-          return e.id === $scope.$stateParams.id
+          return e._id === $scope.$stateParams.id
         })[0]
       };
       $scope.addPlayer = function() {

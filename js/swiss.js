@@ -27,17 +27,17 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
   return {
     playerMatches: function(player) {
       return $.grep(EventData.data.matches, function(match) {
-        return match.players.indexOf(player.id) != -1;
+        return match.players.indexOf(player._id) != -1;
       });
     },
     winLossTie: function(player) {
       var matches = this.playerMatches(player);
       return [
         $.grep(matches, function(match) {
-          return match.winner === player.id;
+          return match.winner === player._id;
         }).length,
         $.grep(matches, function(match) {
-          return match.winner != player.id &&
+          return match.winner != player._id &&
                  match.winner != null &&
                  match.winner != "tie";
         }).length,
@@ -67,7 +67,7 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
         ranked_players.push({
           points: 0,
           player: {
-            id: "bye"
+            _id: "bye"
           }
         });
       }
@@ -95,7 +95,7 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
       var matches = EventData.matches(event);
       var playerIdToOpponents = {}
       for (var i = 0; i < ranked_players.length; ++i)
-        playerIdToOpponents[ranked_players[i].player.id] = {}
+        playerIdToOpponents[ranked_players[i].player._id] = {}
       for (var i in matches) {
         var m = matches[i];
         var player1 = m.players[0];
@@ -119,7 +119,7 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
 
         for (var j = 0; j < players.length; ++j) {
           var player = players[j].player;
-          playerToIndex[player.id] = j;
+          playerToIndex[player._id] = j;
           indexToPlayer[j] = player;
         }
 
@@ -133,9 +133,9 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
             var opponent = players[k].player;
             if (opponent === player)
               continue;
-            if (opponent.id in playerIdToOpponents[player.id])
+            if (opponent._id in playerIdToOpponents[player._id])
               continue;
-            graph[playerToIndex[player.id]].push(playerToIndex[opponent.id]);
+            graph[playerToIndex[player._id]].push(playerToIndex[opponent._id]);
           }
         }
 
@@ -169,15 +169,18 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
 
       for (var i in match_pairs) {
         // Bye always is 2nd player.
-        if (match_pairs[i][0].id === "bye")
+        if (match_pairs[i][0]._id === "bye")
           match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];
         EventData.data.matches.push({
-          id: "match." + uuid(),
-          event: event.id,
+          _id: "match." + uuid(),
+          event: event._id,
           round: event.current_round,
-          players: [match_pairs[i][0].id, match_pairs[i][1].id !== "bye" ? match_pairs[i][1].id : null],
+          players: [
+            match_pairs[i][0]._id,
+            match_pairs[i][1]._id !== "bye" ? match_pairs[i][1]._id : null
+          ],
           games: [],
-          winner: match_pairs[i][1].id !== "bye" ? null : match_pairs[i][0].id
+          winner: match_pairs[i][1]._id !== "bye" ? null : match_pairs[i][0]._id
         });
       }
     }
