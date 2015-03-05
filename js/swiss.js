@@ -55,7 +55,7 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
       var players = EventData.players(event)
       var ranked_players = []
       for (var i in players) {
-        if (!players[i].dropped)
+        if (players[i].dropped !== true && players[i].paid === true)
           ranked_players.push({
             points: this.matchPoints(players[i]),
             player: players[i]
@@ -102,8 +102,10 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
         var player2 = m.players[1];
         if (player2 === null)
           player2 = "bye";
-        playerIdToOpponents[player1][player2] = true;
-        playerIdToOpponents[player2][player1] = true;
+        if (player1 in playerIdToOpponents)
+          playerIdToOpponents[player1][player2] = true;
+        if (player2 in playerIdToOpponents)
+          playerIdToOpponents[player2][player1] = true;
       }
 
       var match_pairs = [];
@@ -160,6 +162,10 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
           groupIndex[i + 1].players.unshift({points: null, player: indexToPlayer[j]});
         }
       }
+
+      // Failed to pair all players.
+      if (match_pairs.length !== ranked_players.length / 2)
+        return;
 
       for (var i in match_pairs) {
         // Bye always is 2nd player.
