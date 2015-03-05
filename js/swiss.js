@@ -153,10 +153,10 @@ app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
           delete indexToPlayer[m1];
         }
 
-        // Pair down the remaining player if we had an odd number of players.
+        // Pair down the remaining players.
         for (var j in indexToPlayer) {
           if (groupIndex[i + 1] === undefined)
-            return;
+            break;
           groupIndex[i + 1].players.unshift({points: null, player: indexToPlayer[j]});
         }
       }
