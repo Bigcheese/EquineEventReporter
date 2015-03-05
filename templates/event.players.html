@@ -1,11 +1,18 @@
 <h3>Players</h3>
 <ul id="players" class="list-group">
-  <li class="list-group-item" ng-repeat="player in model.data.players(model.event)">
-    {{model.swiss.winLossTie(player)}} {{player.name}}
-    <span class="btn-group pull-right">
-      <button type="button" class="btn btn-default">Paid</button>
-      <button type="button" class="btn btn-default">Dropped</button>
-      <button type="button" class="btn btn-default">✖</button>
+  <li class="list-group-item"
+      ng-repeat="player in model.data.players(model.event)">
+    {{model.swiss.winLossTie(player)}} - {{model.swiss.matchPoints(player)}} - {{player.name}}
+
+    <button type="button" class="btn btn-default pull-right">✖</button>    
+    <span class="pull-right">
+      <input type="checkbox" autocomplete="off" ng-model="player.paid">
+        Paid
+      </input>
+      <input type="checkbox" autocomplete="off" ng-model="player.dropped">
+        Dropped
+      </input>
+      |
     </span>
   </li>
   <li class="list-group-item">
