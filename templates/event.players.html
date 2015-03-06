@@ -1,7 +1,8 @@
+<pre>{{model.players | json}}</pre>
 <h3>Players</h3>
 <ul id="players" class="list-group">
   <li class="list-group-item"
-      ng-repeat="player in model.data.players(model.event)">
+      ng-repeat="player in model.players">
     {{model.swiss.winLossTie(player)}} - {{model.swiss.matchPoints(player)}} - {{player.name}}
 
     <button type="button" class="btn btn-default pull-right">✖</button>    

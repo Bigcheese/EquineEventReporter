@@ -1,5 +1,8 @@
+'use strict';
+
 app.factory('EventData', function() {
   var EventData = {
+    db: 'http://127.0.0.1:5984/eer',
     data: {
       events: [
         {
@@ -58,7 +61,7 @@ app.factory('EventData', function() {
     players: function(event) {
       var playerIds = event.players
       var ret = []
-      for (i in this.data.players) {
+      for (var i in this.data.players) {
         var player = this.data.players[i]
         if ($.inArray(player._id, playerIds.some)) {
           ret.push(player)
@@ -70,11 +73,6 @@ app.factory('EventData', function() {
       return $.grep(this.data.matches, function(match) {
         return match.event === event._id
       })
-    },
-    player: function(playerId) {
-      return $.grep(this.data.players, function(player) {
-        return player._id === playerId
-      })[0]
     },
   }
   return EventData
