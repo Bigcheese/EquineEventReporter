@@ -7,6 +7,14 @@ function uuid() {
   });
 }
 
+function deCouchify(result) {
+  var ret = [];
+  result.rows.forEach(function(e) {
+    ret.push(e.value);
+  });
+  return ret;
+}
+
 var app = angular.module('eer', ['ui.router', 'edmons', 'errServices'])
   .run([     '$rootScope', '$state', '$stateParams',
     function ($rootScope,   $state,   $stateParams) {
@@ -15,18 +23,37 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices'])
       $rootScope.$stateParams = $stateParams
     }
   ])
-  .config([  '$stateProvider', '$urlRouterProvider',
-    function ($stateProvider,   $urlRouterProvider) {
+  .config([  '$stateProvider',
+    function ($stateProvider) {
       $stateProvider
         .state('events', {
           url: "/events",
           templateUrl: "templates/events.html",
-          controller: 'EventsCtrl'
+          controller: 'EventsCtrl',
+          controllerAs: 'events',
+          resolve: {
+            events: ['Event',
+              function(Event) {
+                return Event.query().$promise.then(deCouchify);
+              }]
+          }
         })
         .state('event', {
           url: "/event/{id}",
           templateUrl: "templates/event.html",
           controller: 'EventCtrl',
+          controllerAs: 'event',
+          resolve: {
+            event: ['$stateParams', 'Event',
+              function($stateParams, Event) {
+                return Event.get({id: $stateParams.id}).$promise;
+              }],
+            players: ['$stateParams', 'event', 'Player',
+              function($stateParams, event, Player) {
+                return Player.query({keys: JSON.stringify(event.players)})
+                  .$promise.then(deCouchify);
+              }]
+          },
           data: {
             sidebar: [{name: "Players", location: 'event.players'},
                       {name: "Matches", location: 'event.matches'}]
@@ -63,37 +90,19 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices'])
     $scope.alerts = alertsManager.alerts;
     $scope.closeAlert = alertsManager.closeAlert;
   }])
-  .controller('EventsCtrl', ['$scope', 'Events', function($scope, Events) {
-    Events.update();
+  .controller('EventsCtrl', ['$scope', 'events', function($scope, events) {
   	$scope.model = {
-  		events: Events.events
+  		events: events
   	}
   }])
-  .controller('EventCtrl', ['$scope', '$http', 'alertsManager', 'swiss', 'Event', 'Player',
-    function($scope, $http, alertsManager, swiss, Event, Player) {
+  .controller('EventCtrl', ['$scope', 'event', 'players', 'alertsManager', 'swiss', 'Event', 'Player',
+    function($scope, event, players, alertsManager, swiss, Event, Player) {
       $scope.model = {
         matches_filter: null,
         swiss: swiss,
-        event: {},
-        players: {}
+        event: event,
+        players: players
       };
-
-      $scope.update = function() {
-        Event.get({id: $scope.$stateParams.id},
-          function(value) {
-            $scope.model.event = value;
-
-            Player.query({keys: JSON.stringify($scope.model.event.players)},
-              function(value) {
-                $scope.model.players = {};
-                value.rows.forEach(function(p) {
-                  $scope.model.players[p.value._id] = p.value;
-                });
-              });
-          });
-        };
-
-      $scope.update();
 
       $scope.addPlayer = function() {
         if (this.name === undefined || this.name === "")
@@ -107,24 +116,18 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices'])
         
         this.name = "";
         
-        Player.save(player,
-          function(value, responseHeaders) {
-            player._rev = value.rev;
-            var event = $scope.model.event;
-            event.players.push(player._id);
-            Event.save(event,
-              function(value) {
-                event._rev = value._rev;
-                $scope.update();
-              },
-              function(httpResponse) {
-                alertsManager.addAlert(
-                  "Failed to update event: " + httpResponse.data.reason);
-              });
-          },
-          function(httpResponse) {
-            alertsManager.addAlert(
-              "Failed to add player: " + httpResponse.data.reason);
+        Player.save(player)
+          .$promise.then(function(res) {
+            player._rev = res.rev;
+            $scope.model.event.players.push(player._id);
+            $scope.model.players.push(player);
+            return Event.save($scope.model.event).$promise;
+          })
+          .then(function(res) {
+            $scope.model.event._rev = res.rev;
+          })
+          .catch(function(error) {
+            alertsManager.addAlert(error);
           });
       };
     }
