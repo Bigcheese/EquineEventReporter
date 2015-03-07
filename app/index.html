@@ -7,9 +7,11 @@
 
     <title>Equine Event Runner</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+    <!-- build:css css/eer.min.css -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="css/eer.css" rel="stylesheet">
+    <!-- endbuild -->
   </head>
   <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -59,18 +61,16 @@
       </div>
     </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/libs/jquery.min.js"></script>
-    <script src="js/libs/bootstrap.min.js"></script>
-    <script src="js/libs/angular.js"></script>
-    <script src="js/libs/angular-ui-router.min.js"></script>
-    <script src="js/libs/angular-resource.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/eerDb.js"></script>
-    <script src="js/EventData.js"></script>
-    <script src="js/swiss.js"></script>
-    <script src="js/edmons.js"></script>
+    <!-- build:js eer.min.js -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script src="app.js"></script>
+    <script src="services/eerDb.js"></script>
+    <script src="services/swiss.js"></script>
+    <script src="services/edmons.js"></script>
+    <!-- endbuild -->
   </body>
 </html>

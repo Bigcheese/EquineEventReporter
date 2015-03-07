@@ -25,7 +25,9 @@ function fill(array, val) {
     array[i] = val;
 }
 
-app.factory('swiss', ['EventData', 'edmons', function(EventData, edmons) {
+var Swiss = angular.module('Swiss', []);
+
+Swiss.factory('swiss', ['edmons', function(edmons) {
   return {
     playerMatches: function(player) {
       return $.grep(EventData.data.matches, function(match) {

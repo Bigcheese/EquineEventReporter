@@ -1,0 +1,24 @@
+{
+  "name": "eer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Bigcheese/EquineEventReporter",
+  "authors": [
+    "Michael J. Spencer <bigcheesegs@gmail.com>"
+  ],
+  "main": "app/app.js",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.3.14",
+    "angular-ui-router": "~0.2.13",
+    "bootstrap": "~3.3.2",
+    "angular-resource": "~1.3.14"
+  }
+}
