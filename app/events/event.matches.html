@@ -5,7 +5,7 @@
 </div>
 <div id="matches" class="list-group">
   <span class="list-group-item"
-        ng-repeat="match in model.matches | filter:matches_filter" ng-click="saveMatch(match)">
+        ng-repeat="match in model.matches | toArray | filter:matches_filter | orderBy:'round':true" ng-click="saveMatch(match)">
     Round: {{match.round}} -
     <span ng-class="{'label label-success': match.winner === match.players[0]}"
           ng-click="match.winner = match.players[0]"

@@ -9,7 +9,7 @@ function deCouchify(result) {
   return ret;
 }
 
-var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
+var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons', 'errServices', 'Swiss'])
   .run([     '$rootScope', '$state', '$stateParams',
     function ($rootScope,   $state,   $stateParams) {
       // Make $state and $stateParams available everywhere.
@@ -96,12 +96,13 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
            ['$scope', 'eerData', 'event', 'players', 'matches', 'alertsManager', 'swiss',
     function($scope,   eerData,   event,   players,   matches,   alertsManager,   swiss) {
       $scope.model = {
-        matches_filter: null,
         swiss: swiss,
         event: event,
         players: players,
         matches: matches
       };
+      
+      $scope.matches_filter = null;
 
       $scope.addPlayer = function() {
         if (this.name === undefined || this.name === "")
