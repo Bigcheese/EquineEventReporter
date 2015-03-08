@@ -4,7 +4,7 @@
       ng-repeat="player in model.players">
     {{model.swiss.winLossTie(player)}} - {{model.swiss.matchPoints(player)}} - {{player.name}}
 
-    <button type="button" class="btn btn-default pull-right">✖</button>    
+    <button type="button" class="btn btn-default pull-right" ng-click="removePlayer(player, model.event)">✖</button>
     <span class="pull-right">
       <input type="checkbox" autocomplete="off" ng-model="player.paid" ng-click="savePlayer(player)">
         Paid

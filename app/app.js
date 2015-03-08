@@ -120,6 +120,13 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
         eerData.savePlayer(player);
       };
       
+      $scope.removePlayer = function(player, event) {
+        eerData.removePlayer(player, event)
+          .then(function(res) {
+            delete $scope.model.players[player._id];
+          });
+      };
+      
       $scope.saveMatch = function(match) {
         eerData.saveMatch(match);
       };

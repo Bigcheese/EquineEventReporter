@@ -195,6 +195,23 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
         });
     };
     
+    self.removePlayer = function(player, event) {
+      return Player.delete({id: player._id, rev: player._rev}).$promise
+        .then(function(res) {
+          delete self.data.players[res.id];
+          var index = event.players.indexOf(player._id);
+          if (index !== -1) {
+            event.players.splice(index, 1);
+            return self.saveEvent(event);
+          }
+          return res;
+        })
+        .catch(function(error) {
+          alerts.addAlert(error);
+          return error;
+        });
+    };
+    
     self.getPlayers = function(event) {
       var ret = [];
       event.players.forEach(function(p) {
