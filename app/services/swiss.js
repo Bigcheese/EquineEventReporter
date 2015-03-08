@@ -27,7 +27,7 @@ function fill(array, val) {
 
 var Swiss = angular.module('Swiss', []);
 
-Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, uuid) {
+Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, edmons, eerData, uuid) {
   return {
     playerMatches: function(player) {
       var ret = [];
@@ -74,30 +74,14 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
         ranked_players.push({
           points: 0,
           player: {
-            _id: "bye"
+            _id: "bye",
+            name: "bye"
           }
         });
       }
 
       shuffle(ranked_players);
-
-      // Group by rank.
-      var groups = {};
-      for (i = 0; i < ranked_players.length; ++i) {
-        if (!(ranked_players[i].points in groups))
-          groups[ranked_players[i].points] = [];
-        groups[ranked_players[i].points].push(ranked_players[i]);
-      }
-
-      var groupIndex = [];
-      for (i in groups) {
-        groupIndex.push({points: i, players: groups[i]});
-      }
-
-      groupIndex.sort(function(a, b) {
-        return b.points - a.points;
-      });
-
+      
       // Build who has played who map.
       var matches = eerData.getMatches(event);
       var playerIdToOpponents = {};
@@ -114,89 +98,67 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
         if (player2 in playerIdToOpponents)
           playerIdToOpponents[player2][player1] = true;
       }
-
-      var match_pairs = [];
-
-      // Pair groups using max matching.
-      for (i = 0; i < groupIndex.length; ++i) {
-        // Convert to graph format.
-        var playerToIndex = {};
-        var indexToPlayer = {};
-        var gplayers = groupIndex[i].players;
-
-        for (var j = 0; j < gplayers.length; ++j) {
-          var player = gplayers[j].player;
-          playerToIndex[player._id] = j;
-          indexToPlayer[j] = player;
-        }
-
-        var graph = new Array(gplayers.length);
-        for (j = 0; j < graph.length; ++j)
-          graph[j] = [];
-
-        for (j = 0; j < gplayers.length; ++j) {
-          var p = gplayers[j].player;
-          for (var k = 0; k < gplayers.length; ++k) {
-            var opponent = gplayers[k].player;
-            if (opponent === p)
-              continue;
-            if (opponent._id in playerIdToOpponents[p._id])
-              continue;
-            graph[playerToIndex[p._id]].push(playerToIndex[opponent._id]);
-          }
-        }
-
-        var matchings = edmons.maxMatching(graph);
-
-        // Only pair each player once.
-        var paired = {};
-        for (j in matchings) {
-          var m0 = matchings[j][0];
-          var m1 = matchings[j][1];
-          if (m0 in paired || m1 in paired)
-            continue;
-          paired[m0] = true;
-          paired[m1] = true;
-          match_pairs.push([indexToPlayer[m0], indexToPlayer[m1]]);
-          delete indexToPlayer[m0];
-          delete indexToPlayer[m1];
-        }
-
-        // Pair down the remaining players.
-        for (j in indexToPlayer) {
-          if (groupIndex[i + 1] === undefined)
-            break;
-          groupIndex[i + 1].players.unshift({points: null, player: indexToPlayer[j]});
+      
+      // Build weighted edges.
+      var edgeList = [];
+      for (i = 0; i < ranked_players.length; ++i) {
+        for (var j = i + 1; j < ranked_players.length; ++j) {
+          var p1 = ranked_players[i];
+          var p2 = ranked_players[j];
+          var weight = 0;
+          if (playerIdToOpponents[p1.player._id][p2.player._id] === true)
+            // Higher ranked players less likely to be repaired.
+            weight = -Math.max(p1.points, p2.points);
+          else
+            // Prefer same ranked players.
+            weight = Math.min(p1.points, p2.points);
+          edgeList.push([i, j, weight]);
         }
       }
+      
+      var indexToPlayer = {};
 
-      // Failed to pair all players.
-      if (match_pairs.length !== ranked_players.length / 2)
-        return;
-
-      var addedMatches = [];
-      for (i in match_pairs) {
-        // Bye always is 2nd player.
-        if (match_pairs[i][0]._id === "bye")
-          match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];
-        var match = {
-          _id: "match." + uuid(),
-          type: "match",
-          event: event._id,
-          round: event.current_round,
-          players: [
-            match_pairs[i][0]._id,
-            match_pairs[i][1]._id !== "bye" ? match_pairs[i][1]._id : null
-          ],
-          games: [],
-          winner: match_pairs[i][1]._id !== "bye" ? null : match_pairs[i][0]._id
-        };
-        addedMatches.push(match);
+      for (i = 0; i < ranked_players.length; ++i) {
+        var player = ranked_players[i].player;
+        indexToPlayer[i] = player;
       }
-      eerData.saveMatches(addedMatches)
+      
+      $http.post("http://127.0.0.1:8156/", edgeList)
         .then(function(res) {
-          ++event.current_round;
-          return eerData.saveEvent(event);
+          var match_pairs = res.data;
+          // Failed to pair all players.
+          if (match_pairs.length !== ranked_players.length / 2)
+            throw "Failed to pair";
+          
+          for (var i in match_pairs) {
+            match_pairs[i][0] = indexToPlayer[match_pairs[i][0]];
+            match_pairs[i][1] = indexToPlayer[match_pairs[i][1]];
+          }
+
+          var addedMatches = [];
+          for (i in match_pairs) {
+            // Bye always is 2nd player.
+            if (match_pairs[i][0]._id === "bye")
+              match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];
+            var match = {
+              _id: "match." + uuid(),
+              type: "match",
+              event: event._id,
+              round: event.current_round,
+              players: [
+                match_pairs[i][0]._id,
+                match_pairs[i][1]._id !== "bye" ? match_pairs[i][1]._id : null
+              ],
+              games: [],
+              winner: match_pairs[i][1]._id !== "bye" ? null : match_pairs[i][0]._id
+            };
+            addedMatches.push(match);
+          }
+          return eerData.saveMatches(addedMatches)
+            .then(function(res) {
+              ++event.current_round;
+              return eerData.saveEvent(event);
+            });
         });
     }
   };
