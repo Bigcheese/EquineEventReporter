@@ -6,10 +6,10 @@
 
     <button type="button" class="btn btn-default pull-right">✖</button>    
     <span class="pull-right">
-      <input type="checkbox" autocomplete="off" ng-model="player.paid">
+      <input type="checkbox" autocomplete="off" ng-model="player.paid" ng-click="savePlayer(player)">
         Paid
       </input>
-      <input type="checkbox" autocomplete="off" ng-model="player.dropped">
+      <input type="checkbox" autocomplete="off" ng-model="player.dropped" ng-click="savePlayer(player)">
         Dropped
       </input>
       |

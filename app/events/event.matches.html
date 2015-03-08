@@ -1,20 +1,19 @@
 <button class="btn btn-default" ng-click="model.swiss.pair(model.event)">Pair Next Match</button>
-<button class="btn btn-default">Repair Current Match</button>
 <div id="matches-hdr">
   <span class="h3">Matches</span> - <a ng-click="matches_filter = null">All</a> | <a ng-click="matches_filter = {winner: null}">Current</a> | <a ng_click="matches_filter = {winner: '!null'}">Completed</a>
 </div>
 <div id="matches" class="list-group">
   <span class="list-group-item"
-        ng-repeat="match in model.data.matches(model.event) | filter:matches_filter">
+        ng-repeat="match in model.matches | filter:matches_filter">
     Round: {{match.round}} -
     <span ng-class="{'label label-success': match.winner === match.players[0]}"
           ng-click="match.winner = match.players[0]"
-      >{{model.data.player(match.players[0]).name}}</span>
+      >{{model.players[match.players[0]].name}}</span>
     <span ng-hide="match.players[1] === null">
       <span ng-click="match.winner = 'tie'">vs.</span>
       <span ng-class="{'label label-success': match.winner === match.players[1]}"
             ng-click="match.winner = match.players[1]"
-        >{{model.data.player(match.players[1]).name}}</span>
+        >{{model.players[match.players[1]].name}}</span>
     </span>
     <span class="pull-right">lol</span>
   </span>

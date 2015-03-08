@@ -1,13 +1,6 @@
 (function() {
 'use strict';
 
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-    return v.toString(16);
-  });
-}
-
 function deCouchify(result) {
   var ret = [];
   result.rows.forEach(function(e) {
@@ -33,13 +26,9 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
           controller: 'EventsCtrl',
           controllerAs: 'events',
           resolve: {
-            events: ['Event', 'alertsManager',
-              function(Event, alerts) {
-                return Event.query().$promise
-                  .then(deCouchify)
-                  .catch(function(e) {
-                    alerts.addAlert(e);
-                  });
+            events: ['eerData',
+              function(eerData) {
+                return eerData.loadEvents();
               }]
           }
         })
@@ -49,14 +38,17 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
           controller: 'EventCtrl',
           controllerAs: 'event',
           resolve: {
-            event: ['$stateParams', 'Event',
-              function($stateParams, Event) {
-                return Event.get({id: $stateParams.id}).$promise;
+            event: ['$stateParams', 'eerData',
+              function($stateParams, eerData) {
+                return eerData.loadEvent($stateParams.id);
               }],
-            players: ['$stateParams', 'event', 'Player',
-              function($stateParams, event, Player) {
-                return Player.query({keys: JSON.stringify(event.players)})
-                  .$promise.then(deCouchify);
+            players: ['event', 'eerData',
+              function(event, eerData) {
+                return eerData.loadPlayers(event);
+              }],
+            matches: ['eerData',
+              function(eerData) {
+                return eerData.loadMatches();
               }]
           },
           data: {
@@ -100,44 +92,34 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
   		events: events
   	};
   }])
-  .controller('EventCtrl', ['$scope', 'event', 'players', 'alertsManager', 'swiss', 'Event', 'Player',
-    function($scope, event, players, alertsManager, swiss, Event, Player) {
+  .controller('EventCtrl',
+           ['$scope', 'eerData', 'event', 'players', 'matches', 'alertsManager', 'swiss',
+    function($scope,   eerData,   event,   players,   matches,   alertsManager,   swiss) {
       $scope.model = {
         matches_filter: null,
         swiss: swiss,
         event: event,
-        players: players
+        players: players,
+        matches: matches
       };
 
       $scope.addPlayer = function() {
         if (this.name === undefined || this.name === "")
           return;
         
-        var player = {
-          _id: "player." + uuid(),
-          type: "player",
-          name: this.name
-        };
+        eerData.addPlayer(event, this.name)
+          .then(function(player) {
+            $scope.model.players[player._id] = player;
+          });
         
         this.name = "";
-        
-        Player.save(player)
-          .$promise.then(function(res) {
-            player._rev = res.rev;
-            $scope.model.event.players.push(player._id);
-            $scope.model.players.push(player);
-            return Event.save($scope.model.event).$promise;
-          })
-          .then(function(res) {
-            $scope.model.event._rev = res.rev;
-          })
-          .catch(function(error) {
-            alertsManager.addAlert(error);
-          });
+      };
+      
+      $scope.savePlayer = function(player) {
+        eerData.savePlayer(player);
       };
     }
   ])
   ;
 
 })();
-  

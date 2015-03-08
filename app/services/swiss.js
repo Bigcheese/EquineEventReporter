@@ -27,12 +27,16 @@ function fill(array, val) {
 
 var Swiss = angular.module('Swiss', []);
 
-Swiss.factory('swiss', ['edmons', function(edmons) {
+Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, uuid) {
   return {
     playerMatches: function(player) {
-      return $.grep(EventData.data.matches, function(match) {
-        return match.players.indexOf(player._id) != -1;
-      });
+      var ret = [];
+      for (var i in eerData.data.matches) {
+        var m = eerData.data.matches[i];
+        if (m.players.indexOf(player._id) !== -1)
+          ret.push(m);
+      }
+      return ret;
     },
     winLossTie: function(player) {
       var matches = this.playerMatches(player);
@@ -52,11 +56,11 @@ Swiss.factory('swiss', ['edmons', function(edmons) {
     },
     matchPoints: function(player) {
       var wlt = this.winLossTie(player);
-      return (wlt[0] * 3) + wlt[2];
+      return (wlt[0] * 3) + wlt[1] + (wlt[2] * 2);
     },
     pair: function(event) {
       event.current_round++
-      var players = EventData.players(event)
+      var players = eerData.getPlayers(event);
       var ranked_players = []
       for (var i in players) {
         if (players[i].dropped !== true && players[i].paid === true)
@@ -96,7 +100,7 @@ Swiss.factory('swiss', ['edmons', function(edmons) {
       });
 
       // Build who has played who map.
-      var matches = EventData.matches(event);
+      var matches = eerData.getMatches(event);
       var playerIdToOpponents = {}
       for (var i = 0; i < ranked_players.length; ++i)
         playerIdToOpponents[ranked_players[i].player._id] = {}
@@ -171,12 +175,14 @@ Swiss.factory('swiss', ['edmons', function(edmons) {
       if (match_pairs.length !== ranked_players.length / 2)
         return;
 
+      var addedMatches = [];
       for (var i in match_pairs) {
         // Bye always is 2nd player.
         if (match_pairs[i][0]._id === "bye")
           match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];
-        EventData.data.matches.push({
+        var match = {
           _id: "match." + uuid(),
+          type: "match",
           event: event._id,
           round: event.current_round,
           players: [
@@ -185,8 +191,10 @@ Swiss.factory('swiss', ['edmons', function(edmons) {
           ],
           games: [],
           winner: match_pairs[i][1]._id !== "bye" ? null : match_pairs[i][0]._id
-        });
+        };
+        addedMatches.push(match);
       }
+      eerData.saveMatches(addedMatches);
     }
   };
 }]);
