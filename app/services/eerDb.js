@@ -11,10 +11,10 @@ function couchRowsToObjectById(rows, object) {
   return object;
 }
 
-eerServices.factory('eerData', ['$resource', 'alertsManager', 'uuid',
-  function($resource, alerts, uuid) {
+eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
+  function($resource, $q, alerts, uuid) {
     var self = this;
-    
+
     self.data = {};
     self.data.events = {};
     self.data.players = {};
@@ -27,7 +27,7 @@ eerServices.factory('eerData', ['$resource', 'alertsManager', 'uuid',
         url: _dbPath + "/_design/eer/_view/events"
       }
     });
-    
+
     var Player = $resource(_dbPath + "/:id", {}, {
       query: {
         method: "GET",
@@ -35,7 +35,7 @@ eerServices.factory('eerData', ['$resource', 'alertsManager', 'uuid',
         url: _dbPath + "/_design/eer/_view/players"
       }
     });
-    
+
     var Match = $resource(_dbPath + "/:id", {}, {
       query: {
         method: "GET",
@@ -67,6 +67,17 @@ eerServices.factory('eerData', ['$resource', 'alertsManager', 'uuid',
         })
         .catch(function(error) {
           alerts.addAlert(error);
+        });
+    };
+    
+    self.saveEvent = function(event) {
+      return Event.save(event).$promise
+        .then(function(res) {
+          event._rev = res.rev;
+        })
+        .catch(function(error) {
+          alerts.addAlert(error);
+          return error;
         });
     };
     
@@ -115,8 +126,36 @@ eerServices.factory('eerData', ['$resource', 'alertsManager', 'uuid',
           matches.forEach(function(m) {
             self.data.matches[m._id] = m;
           });
+          res.forEach(function(r) {
+            self.data.matches[r.id]._rev = r.rev;
+          });
           return matches;
         });
+    };
+    
+    self.saveMatch = function(match) {
+      return Match.save(match).$promise
+        .then(function(res) {
+          match._rev = res.rev;
+        })
+        .catch(function(error) {
+          alerts.addAlert(error);
+          return error;
+        });
+    };
+    
+    self.resetMatches = function(event) {
+      var matches = [];
+      for (var i in self.data.matches) {
+        var m = self.data.matches[i];
+        if (m.event !== event._id)
+          continue;
+        delete self.data.matches[i];
+        m._deleted = true;
+        matches.push(m);
+      }
+      event.current_round = 1;
+      return $q.all([self.saveMatches(matches), self.saveEvent(event)]);
     };
     
     self.addPlayer = function(event, name) {

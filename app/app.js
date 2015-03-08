@@ -118,6 +118,14 @@ var app = angular.module('eer', ['ui.router', 'edmons', 'errServices', 'Swiss'])
       $scope.savePlayer = function(player) {
         eerData.savePlayer(player);
       };
+      
+      $scope.saveMatch = function(match) {
+        eerData.saveMatch(match);
+      };
+      
+      $scope.resetMatches = function() {
+        eerData.resetMatches($scope.model.event);
+      };
     }
   ])
   ;

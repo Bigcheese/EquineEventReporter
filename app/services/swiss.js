@@ -59,7 +59,6 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
       return (wlt[0] * 3) + wlt[1] + (wlt[2] * 2);
     },
     pair: function(event) {
-      event.current_round++
       var players = eerData.getPlayers(event);
       var ranked_players = []
       for (var i in players) {
@@ -194,7 +193,11 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
         };
         addedMatches.push(match);
       }
-      eerData.saveMatches(addedMatches);
+      eerData.saveMatches(addedMatches)
+        .then(function(res) {
+          ++event.current_round;
+          return eerData.saveEvent(event);
+        });
     }
   };
 }]);
