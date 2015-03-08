@@ -45,9 +45,9 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
           return match.winner === player._id;
         }).length,
         $.grep(matches, function(match) {
-          return match.winner != player._id &&
-                 match.winner != null &&
-                 match.winner != "tie";
+          return match.winner !== player._id &&
+                 match.winner !== null &&
+                 match.winner !== "tie";
         }).length,
         $.grep(matches, function(match) {
           return match.winner === "tie";
@@ -60,7 +60,7 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
     },
     pair: function(event) {
       var players = eerData.getPlayers(event);
-      var ranked_players = []
+      var ranked_players = [];
       for (var i in players) {
         if (players[i].dropped !== true && players[i].paid === true)
           ranked_players.push({
@@ -83,14 +83,14 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
 
       // Group by rank.
       var groups = {};
-      for (var i = 0; i < ranked_players.length; ++i) {
+      for (i = 0; i < ranked_players.length; ++i) {
         if (!(ranked_players[i].points in groups))
           groups[ranked_players[i].points] = [];
         groups[ranked_players[i].points].push(ranked_players[i]);
       }
 
-      var groupIndex = []
-      for (var i in groups) {
+      var groupIndex = [];
+      for (i in groups) {
         groupIndex.push({points: i, players: groups[i]});
       }
 
@@ -100,10 +100,10 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
 
       // Build who has played who map.
       var matches = eerData.getMatches(event);
-      var playerIdToOpponents = {}
-      for (var i = 0; i < ranked_players.length; ++i)
-        playerIdToOpponents[ranked_players[i].player._id] = {}
-      for (var i in matches) {
+      var playerIdToOpponents = {};
+      for (i = 0; i < ranked_players.length; ++i)
+        playerIdToOpponents[ranked_players[i].player._id] = {};
+      for (i in matches) {
         var m = matches[i];
         var player1 = m.players[0];
         var player2 = m.players[1];
@@ -118,31 +118,31 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
       var match_pairs = [];
 
       // Pair groups using max matching.
-      for (var i = 0; i < groupIndex.length; ++i) {
+      for (i = 0; i < groupIndex.length; ++i) {
         // Convert to graph format.
         var playerToIndex = {};
         var indexToPlayer = {};
-        var players = groupIndex[i].players;
+        var gplayers = groupIndex[i].players;
 
-        for (var j = 0; j < players.length; ++j) {
-          var player = players[j].player;
+        for (var j = 0; j < gplayers.length; ++j) {
+          var player = gplayers[j].player;
           playerToIndex[player._id] = j;
           indexToPlayer[j] = player;
         }
 
-        var graph = new Array(players.length);
-        for (var j = 0; j < graph.length; ++j)
+        var graph = new Array(gplayers.length);
+        for (j = 0; j < graph.length; ++j)
           graph[j] = [];
 
-        for (var j = 0; j < players.length; ++j) {
-          var player = players[j].player;
-          for (var k = 0; k < players.length; ++k) {
-            var opponent = players[k].player;
-            if (opponent === player)
+        for (j = 0; j < gplayers.length; ++j) {
+          var p = gplayers[j].player;
+          for (var k = 0; k < gplayers.length; ++k) {
+            var opponent = gplayers[k].player;
+            if (opponent === p)
               continue;
-            if (opponent._id in playerIdToOpponents[player._id])
+            if (opponent._id in playerIdToOpponents[p._id])
               continue;
-            graph[playerToIndex[player._id]].push(playerToIndex[opponent._id]);
+            graph[playerToIndex[p._id]].push(playerToIndex[opponent._id]);
           }
         }
 
@@ -150,7 +150,7 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
 
         // Only pair each player once.
         var paired = {};
-        for (var j in matchings) {
+        for (j in matchings) {
           var m0 = matchings[j][0];
           var m1 = matchings[j][1];
           if (m0 in paired || m1 in paired)
@@ -163,7 +163,7 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
         }
 
         // Pair down the remaining players.
-        for (var j in indexToPlayer) {
+        for (j in indexToPlayer) {
           if (groupIndex[i + 1] === undefined)
             break;
           groupIndex[i + 1].players.unshift({points: null, player: indexToPlayer[j]});
@@ -175,7 +175,7 @@ Swiss.factory('swiss', ['edmons', 'eerData', 'uuid', function(edmons, eerData, u
         return;
 
       var addedMatches = [];
-      for (var i in match_pairs) {
+      for (i in match_pairs) {
         // Bye always is 2nd player.
         if (match_pairs[i][0]._id === "bye")
           match_pairs[i][1] = [match_pairs[i][0], match_pairs[i][0] = match_pairs[i][1]][0];

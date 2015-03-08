@@ -51,7 +51,7 @@
     q[qt++] = root;
     while (qh < qt) {
       var v = q[qh++];
-      for (var i = 0; i < graph[v].length; ++i) {
+      for (i = 0; i < graph[v].length; ++i) {
         var to = graph[v][i];
         if (base[v] === base[to] || match[v] === to)
           continue;
@@ -61,12 +61,12 @@
           fill(blossom, false);
           markPath(match, base, blossom, p, v, curbase, to);
           markPath(match, base, blossom, p, to, curbase, v);
-          for (var i = 0; i < n; ++i) {
-            if (blossom[base[i]] === true) {
-              base[i] = curbase;
-              if (used[i] === false) {
-                used[i] = true;
-                q[qt++] = i;
+          for (var j = 0; j < n; ++j) {
+            if (blossom[base[j]] === true) {
+              base[j] = curbase;
+              if (used[j] === false) {
+                used[j] = true;
+                q[qt++] = j;
               }
             }
           }
@@ -103,7 +103,7 @@
       }
     }
     var matches = [];
-    for (var i = 0; i < n; ++i)
+    for (i = 0; i < n; ++i)
       if (match[i] !== -1)
         matches.push([i, match[i]]);
     return matches;
