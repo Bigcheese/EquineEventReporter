@@ -1,8 +1,8 @@
 <h3>Players</h3>
 <ul id="players" class="list-group">
   <li class="list-group-item"
-      ng-repeat="player in model.players">
-    {{model.swiss.winLossTie(player)}} - {{model.swiss.matchPoints(player)}} - {{player.name}}
+      ng-repeat="player in model.players | toArray | orderBy:comparePlayer:'True'">
+    {{model.swiss.winLossTie(player)}} - {{model.swiss.matchPoints(player)}} - {{model.swiss.opponentsMatchWinPercentage(player)}} - {{player.name}}
 
     <button type="button" class="btn btn-default pull-right" ng-click="removePlayer(player, model.event)">✖</button>
     <span class="pull-right">

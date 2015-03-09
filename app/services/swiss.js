@@ -58,6 +58,25 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       var wlt = this.winLossTie(player);
       return (wlt[0] * 3) + wlt[1] + (wlt[2] * 2);
     },
+    opponentsMatchWinPercentage: function(player) {
+      var matches = this.playerMatches(player);
+      var totalOp = 0;
+      var totalMatches = 0;
+      var self = this;
+      matches.forEach(function(m) {
+        // Ignore byes.
+        if (m.players[1] === null)
+          return;
+        var opponent = m.players[0] === player._id ?
+          eerData.data.players[m.players[1]] :
+          eerData.data.players[m.players[0]];
+        totalOp += self.matchPoints(opponent) /
+          (self.playerMatches(opponent).length * 3);
+        ++totalMatches;
+      });
+      var ret = totalOp / totalMatches;
+      return isNaN(ret) ? 0 : ret;
+    },
     pair: function(event) {
       var players = eerData.getPlayers(event);
       var ranked_players = [];

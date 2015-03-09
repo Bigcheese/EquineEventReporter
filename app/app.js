@@ -134,6 +134,12 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
       $scope.resetMatches = function() {
         eerData.resetMatches($scope.model.event);
       };
+      
+      $scope.comparePlayer = function(a) {
+        var mp = $scope.model.swiss.matchPoints(a);
+        var omwp = $scope.model.swiss.opponentsMatchWinPercentage(a);
+        return mp + omwp;
+      };
     }
   ])
   ;
