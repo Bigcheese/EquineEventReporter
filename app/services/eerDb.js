@@ -58,7 +58,7 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
           alerts.addAlert(error);
         });
     };
-    
+
     self.loadEvent = function(id) {
       return Event.get({id: id}).$promise
         .then(function(res) {
@@ -74,6 +74,28 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       return Event.save(event).$promise
         .then(function(res) {
           event._rev = res.rev;
+          self.data.events[event._id] = event;
+          return res;
+        })
+        .catch(function(error) {
+          alerts.addAlert(error);
+          return error;
+        });
+    };
+    
+    self.removeEvent = function(event) {
+      return Event.delete({id: event._id, rev: event._rev}).$promise
+        .then(function(res) {
+          delete self.data.events[res.id];
+          // TODO: Make this a bulk operation.
+          event.players.forEach(function(pID) {
+            Player.delete({id: pID, rev: self.data.players[pID]._rev}).$promise
+              .then(function(res) {
+                delete self.data.players[res.id];
+                return res;
+              });
+          });
+          return res;
         })
         .catch(function(error) {
           alerts.addAlert(error);

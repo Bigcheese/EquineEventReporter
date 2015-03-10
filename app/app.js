@@ -87,10 +87,36 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
     $scope.alerts = alertsManager.alerts;
     $scope.closeAlert = alertsManager.closeAlert;
   }])
-  .controller('EventsCtrl', ['$scope', 'events', function($scope, events) {
+  .controller('EventsCtrl',
+         ['$scope', 'events', 'eerData', 'uuid',
+  function($scope,   events,   eerData,   uuid) {
   	$scope.model = {
   		events: events
   	};
+    
+    $scope.addEvent = function(name) {
+      if (this.name === undefined || this.name === "")
+        return;
+
+      // TODO: Construct default events in a sane location?
+      var event = {
+        _id: 'event.' + uuid(),
+        type: 'event',
+        name: this.name,
+        current_round: 1,
+        players: [],
+        done: false,
+        eventType: "swiss"
+      };
+
+      eerData.saveEvent(event);
+
+      this.name = "";
+    };
+    
+    $scope.removeEvent = function(event) {
+      return eerData.removeEvent(event);
+    };
   }])
   .controller('EventCtrl',
            ['$scope', 'eerData', 'event', 'players', 'matches', 'alertsManager', 'swiss',

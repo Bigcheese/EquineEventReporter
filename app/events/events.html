@@ -1,5 +1,15 @@
 <h1 class="page-header">Events</h1>
 <div class="list-group">
-  <a class="list-group-item"
-     ng-repeat="event in model.events" ui-sref="event({id:event._id})">{{event.name}}</a>
+  <div class="list-group-item"  ng-repeat="event in model.events">
+    <a ui-sref="event({id:event._id})">{{event.name}}</a>
+    <button type="button" class="btn btn-default pull-right" ng-click="removeEvent(event)">✖</button>
+  </div>
+  <div class="list-group-item">
+    <form class="form-inline" ng-submit="addEvent()">
+      <label>Add Event: </label>
+      <input type="text" class="form-control" placeholder="Name"
+             ng-model="name" />
+      <button type="submit" class="btn btn-default"><b>＋</b></button>
+    </form>
+  </div>
 </div>
