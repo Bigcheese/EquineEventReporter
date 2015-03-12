@@ -46,9 +46,9 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
               function(event, eerData) {
                 return eerData.loadPlayers(event);
               }],
-            matches: ['eerData',
-              function(eerData) {
-                return eerData.loadMatches();
+            matches: ['event', 'eerData',
+              function(event, eerData) {
+                return eerData.loadMatches(event);
               }]
           },
           data: {
@@ -153,12 +153,22 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
           });
       };
       
+      $scope.pair = function() {
+        swiss.pair(event)
+          .then(function(addedMatches) {
+            addedMatches.forEach(function(match) {
+              $scope.model.matches[match._id] = match;
+            });
+          });
+      };
+      
       $scope.saveMatch = function(match) {
         eerData.saveMatch(match);
       };
       
       $scope.resetMatches = function() {
         eerData.resetMatches($scope.model.event);
+        $scope.model.matches = {};
       };
       
       $scope.comparePlayer = function(a) {

@@ -123,10 +123,20 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
         });
     };
 
-    self.loadMatches = function() {
-      return Match.query().$promise
+    self.loadMatches = function(event) {
+      var queryParams = {};
+      
+      if (event !== undefined)
+        queryParams.key = JSON.stringify([event._id]);
+      
+      return Match.query(queryParams).$promise
         .then(function(res) {
-          return couchRowsToObjectById(res.rows, self.data.matches);
+          // Update cache
+          couchRowsToObjectById(res.rows, self.data.matches);
+          if (event === undefined)
+            return self.data.matches;
+          var ret = {};
+          return couchRowsToObjectById(res.rows, ret);
         })
         .catch(function(error) {
           alerts.addAlert(error);

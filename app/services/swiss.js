@@ -142,7 +142,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         indexToPlayer[i] = player;
       }
       
-      $http.post("http://127.0.0.1:8156/", edgeList)
+      return $http.post("http://127.0.0.1:8156/", edgeList)
         .then(function(res) {
           var match_pairs = res.data;
           // Failed to pair all players.
@@ -176,7 +176,11 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
           return eerData.saveMatches(addedMatches)
             .then(function(res) {
               ++event.current_round;
-              return eerData.saveEvent(event);
+              return eerData.saveEvent(event)
+                .then(function() {
+                  // So the caller has access. 
+                  return addedMatches;
+                });
             });
         });
     }
