@@ -87,15 +87,18 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       return Event.delete({id: event._id, rev: event._rev}).$promise
         .then(function(res) {
           delete self.data.events[res.id];
-          // TODO: Make this a bulk operation.
-          event.players.forEach(function(pID) {
-            Player.delete({id: pID, rev: self.data.players[pID]._rev}).$promise
-              .then(function(res) {
-                delete self.data.players[res.id];
-                return res;
-              });
+          // Make sure the players are loaded.
+          self.loadPlayers(event).then(function() {
+            // TODO: Make this a bulk operation.
+            event.players.forEach(function(pID) {
+              Player.delete({id: pID, rev: self.data.players[pID]._rev})
+                .$promise.then(function(res) {
+                  delete self.data.players[res.id];
+                  return res;
+                });
+            });
+            return res;
           });
-          return res;
         })
         .catch(function(error) {
           alerts.addAlert(error);
