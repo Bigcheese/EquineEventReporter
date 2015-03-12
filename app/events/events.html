@@ -1,6 +1,6 @@
 <h1 class="page-header">Events</h1>
 <div class="list-group">
-  <div class="list-group-item"  ng-repeat="event in model.events">
+  <div class="list-group-item"  ng-repeat="event in model.events | toArray | orderBy:'_id':true">
     <a ui-sref="event({id:event._id})">{{event.name}}</a>
     <button type="button" class="btn btn-default pull-right" ng-click="removeEvent(event)">✖</button>
   </div>

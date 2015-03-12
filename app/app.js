@@ -100,7 +100,7 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
 
       // TODO: Construct default events in a sane location?
       var event = {
-        _id: 'event.' + uuid(),
+        _id: 'event.' + Date.now() + uuid(),
         type: 'event',
         name: this.name,
         current_round: 1,
