@@ -159,10 +159,13 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       return Match.saveBulk({docs: matches}).$promise
         .then(function(res) {
           matches.forEach(function(m) {
+            if (m._deleted)
+              return;
             self.data.matches[m._id] = m;
           });
           res.forEach(function(r) {
-            self.data.matches[r.id]._rev = r.rev;
+            if (self.data.matches[r.id])
+              self.data.matches[r.id]._rev = r.rev;
           });
           return matches;
         });
@@ -172,6 +175,7 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       return Match.save(match).$promise
         .then(function(res) {
           match._rev = res.rev;
+          return res;
         })
         .catch(function(error) {
           alerts.addAlert(error);
@@ -192,6 +196,28 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       event.current_round = 1;
       return $q.all([self.saveMatches(matches), self.saveEvent(event)]);
     };
+
+    self.unpairLastRound = function(event) {
+      --event.current_round;
+      if (event.current_round < 1)
+        event.current_round = 1;
+
+      var round = event.current_round;
+      var matches = [];
+      for (var i in self.data.matches) {
+        var m = self.data.matches[i];
+        if (m.event === event._id && m.round === round) {
+          m._deleted = true;
+          matches.push(m);
+          delete self.data.matches[i];
+        }
+      }
+      return self.saveMatches(matches)
+        .then(function(res) {
+          self.saveEvent(event);
+          return self.loadMatches(event);
+        });
+    }
     
     self.addPlayer = function(event, name) {
       var player = {

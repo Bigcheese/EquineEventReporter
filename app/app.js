@@ -119,8 +119,8 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
     };
   }])
   .controller('EventCtrl',
-           ['$scope', 'eerData', 'event', 'players', 'matches', 'alertsManager', 'swiss',
-    function($scope,   eerData,   event,   players,   matches,   alertsManager,   swiss) {
+           ['$scope', '$timeout', 'eerData', 'event', 'players', 'matches', 'alertsManager', 'swiss',
+    function($scope,   $timeout,   eerData,   event,   players,   matches,   alertsManager,   swiss) {
       $scope.model = {
         swiss: swiss,
         event: event,
@@ -170,6 +170,13 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
         eerData.resetMatches($scope.model.event);
         $scope.model.matches = {};
       };
+
+      $scope.unpairLastRound = function() {
+        eerData.unpairLastRound($scope.model.event)
+          .then(function(res) {
+            $scope.model.matches = res;
+          });
+      }
       
       $scope.comparePlayer = function(a) {
         var mp = $scope.model.swiss.matchPoints(a);
