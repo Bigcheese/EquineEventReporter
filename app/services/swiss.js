@@ -125,16 +125,20 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
           var p1 = ranked_players[i];
           var p2 = ranked_players[j];
           var weight = 0;
-          if (playerIdToOpponents[p1.player._id][p2.player._id] === true)
-            // Higher ranked players less likely to be repaired.
-            weight = -Math.max(p1.points, p2.points);
-          else
-            // Prefer same ranked players.
-            weight = Math.min(p1.points, p2.points);
+          var alreadyPlayedCount = playerIdToOpponents[p1.player._id][p2.player._id] === true ? 1 : 0;
+          // calculate pairing weight. higher is better.
+          var max = Math.max(p1.points, p2.points);
+          var min = Math.min(p1.points, p2.points);
+          // Base weight is the average of the two players
+          weight = (max + min) / 2;
+          // Give a pentalty based on the difference beetween them.
+          weight -= (max - min) / 10; // Why 10? No idea.
+          // Give moar pentalty if they've already played.
+          weight -= max * alreadyPlayedCount;
           edgeList.push([i, j, weight]);
         }
       }
-      
+
       var indexToPlayer = {};
 
       for (i = 0; i < ranked_players.length; ++i) {
