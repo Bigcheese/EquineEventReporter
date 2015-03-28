@@ -183,6 +183,13 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
         var omwp = $scope.model.swiss.opponentsMatchWinPercentage(a);
         return mp + omwp;
       };
+
+      $scope.removeMatch = function(match) {
+        eerData.removeMatch(match)
+          .then(function(res) {
+            delete $scope.model.matches[match._id];
+          });
+      };
     }
   ])
   ;

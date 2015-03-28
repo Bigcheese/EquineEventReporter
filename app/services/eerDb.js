@@ -217,7 +217,19 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
           self.saveEvent(event);
           return self.loadMatches(event);
         });
-    }
+    };
+
+    self.removeMatch = function(match) {
+      return Match.delete({id: match._id, rev: match._rev}).$promise
+        .then(function(res) {
+          delete self.data.matches[match._id];
+          return res;
+        })
+        .catch(function(error) {
+          alerts.addAlert(error);
+          return error;
+        });
+    };
     
     self.addPlayer = function(event, name) {
       var player = {

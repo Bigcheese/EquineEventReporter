@@ -55,26 +55,8 @@ button {
   padding: 10px 0px;
 }
 
-#players button {
+#players button, #matches button {
   padding: 1px 5px;
-}
-
-#players > li .delete {
-  font-size: 15px;
-  color: #a88a8a;
-}
-
-#players > li .delete:after {
-  content: '✖';
-}
-
-#players > li:hover .delete {
-  display: block;
-  float: right;
-}
-
-#players > li .delete:hover {
-
 }
 
 /* Sidebar navigation */
