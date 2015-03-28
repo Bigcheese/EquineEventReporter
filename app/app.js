@@ -154,7 +154,16 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
       };
       
       $scope.pair = function() {
-        swiss.pair(event)
+        swiss.pair(event, true)
+          .then(function(addedMatches) {
+            addedMatches.forEach(function(match) {
+              $scope.model.matches[match._id] = match;
+            });
+          });
+      };
+
+      $scope.pairCurrent = function() {
+        swiss.pair(event, false)
           .then(function(addedMatches) {
             addedMatches.forEach(function(match) {
               $scope.model.matches[match._id] = match;

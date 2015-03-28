@@ -77,7 +77,9 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       var ret = totalOp / totalMatches;
       return isNaN(ret) ? 0 : ret;
     },
-    pair: function(event) {
+    pair: function(event, pairNext) {
+      if (!pairNext)
+        --event.current_round;
       var players = eerData.getPlayers(event);
       var ranked_players = [];
       for (var i in players) {
@@ -100,16 +102,24 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       }
 
       shuffle(ranked_players);
+      var rankedIndex = {}
       
       // Build who has played who map.
       var matches = eerData.getMatches(event);
       var playerIdToOpponents = {};
-      for (i = 0; i < ranked_players.length; ++i)
+      for (i = 0; i < ranked_players.length; ++i) {
+        rankedIndex[ranked_players[i].player._id] = i;
         playerIdToOpponents[ranked_players[i].player._id] = {};
+      }
+      var indiciesToRemove = {};
       for (i in matches) {
         var m = matches[i];
         var player1 = m.players[0];
         var player2 = m.players[1];
+        if (m.round == event.current_round) {
+          indiciesToRemove[rankedIndex[player1]] = true;
+          indiciesToRemove[rankedIndex[player2]] = true;
+        }
         if (player2 === null)
           player2 = "bye";
         if (player1 in playerIdToOpponents)
@@ -117,6 +127,13 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         if (player2 in playerIdToOpponents)
           playerIdToOpponents[player2][player1] = true;
       }
+
+      var newRanked = []
+      for (i = 0; i < ranked_players.length; ++i) {
+        if (!(i in indiciesToRemove))
+          newRanked.push(ranked_players[i]);
+      }
+      ranked_players = newRanked;
       
       // Build weighted edges.
       var edgeList = [];
