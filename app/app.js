@@ -53,7 +53,8 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
           },
           data: {
             sidebar: [{name: "Players", location: 'event.players'},
-                      {name: "Matches", location: 'event.matches'}]
+                      {name: "Matches", location: 'event.matches'},
+                      {name: "Matches - Slips", location: 'event.slips'}]
           }
         })
         .state('event.players', {
@@ -63,6 +64,10 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
         .state('event.matches', {
           url: "/matches",
           templateUrl: "events/event.matches.html"
+        })
+        .state('event.slips', {
+          url: "/slips",
+          templateUrl: "events/event.matches.slips.html"
         });
     }
   ])

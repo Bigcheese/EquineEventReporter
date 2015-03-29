@@ -55,6 +55,17 @@ button {
   padding: 10px 0px;
 }
 
+@media print {
+  h2 {
+    display: none;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+  }
+}
+
 #players button, #matches button {
   padding: 1px 5px;
 }
@@ -74,4 +85,19 @@ button {
 .nav-sidebar > .active > a:focus {
   color: #fff;
   background-color: #428bca;
+}
+
+#match_slips {
+  padding: 0;
+  margin: 0;
+}
+
+#match_slips ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+
+#match_slips li {
+  padding-bottom: .2in;
 }
