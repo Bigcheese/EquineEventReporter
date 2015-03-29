@@ -190,7 +190,7 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
           .then(function(res) {
             $scope.model.matches = res;
           });
-      }
+      };
       
       $scope.comparePlayer = function(a) {
         var mp = $scope.model.swiss.matchPoints(a);

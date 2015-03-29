@@ -102,7 +102,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       }
 
       shuffle(ranked_players);
-      var rankedIndex = {}
+      var rankedIndex = {};
       
       // Build who has played who map.
       var matches = eerData.getMatches(event);
@@ -128,7 +128,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
           playerIdToOpponents[player2][player1] = true;
       }
 
-      var newRanked = []
+      var newRanked = [];
       for (i = 0; i < ranked_players.length; ++i) {
         if (!(i in indiciesToRemove))
           newRanked.push(ranked_players[i]);
