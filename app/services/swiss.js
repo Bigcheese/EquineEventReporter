@@ -77,6 +77,16 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       var ret = totalOp / totalMatches;
       return isNaN(ret) ? 0 : ret;
     },
+    matchRank: function(match) {
+      if (match.players[1] === 'bye')
+        return [0, 0];
+      var p1 = eerData.data.players[match.players[0]];
+      var p2 = eerData.data.players[match.players[1]];
+      var mpAvg = (this.matchPoints(p1) + this.matchPoints(p2)) / 2;
+      var omwpAvg = (this.opponentsMatchWinPercentage(p1) +
+                     this.opponentsMatchWinPercentage(p2)) / 2;
+      return [mpAvg, omwpAvg];
+    },
     pair: function(event, pairNext) {
       if (!pairNext)
         --event.current_round;
@@ -133,6 +143,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         if (!(i in indiciesToRemove))
           newRanked.push(ranked_players[i]);
       }
+      var alreadyMatched = ranked_players.length !== newRanked.length;
       ranked_players = newRanked;
       
       // Build weighted edges.
@@ -163,6 +174,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         indexToPlayer[i] = player;
       }
       
+      var self = this;
       return $http.post("http://127.0.0.1:8156/", edgeList)
         .then(function(res) {
           var match_pairs = res.data;
@@ -192,8 +204,39 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
               games: [],
               winner: match_pairs[i][1]._id !== "bye" ? null : match_pairs[i][0]._id
             };
+            match.rank = self.matchRank(match);
             addedMatches.push(match);
           }
+          
+          // Sort matches and assign tables.
+          addedMatches.sort(function(a, b) {
+            if (a.rank[0] !== b.rank[0])
+              return b.rank[0] - a.rank[0];
+            if (a.rank[1] !== b.rank[1])
+              return b.rank[1] - a.rank[1];
+            return a._id < b._id;
+          });
+          
+          if (!alreadyMatched) {
+            for (i = 0; i < addedMatches.length; ++i)
+              addedMatches[i].table = i + 1;
+          } else {
+            // Find empty tables.
+            var usedTables = {};
+            for (i = 0; i < matches.length; ++i) {
+              var m = matches[i];
+              if (m.round == event.current_round)
+                usedTables[m.table] = true;
+            }
+            i = 1;
+            var j = 0;
+            while (j < addedMatches.length) {
+              if (!(i in usedTables))
+                addedMatches[j++].table = i;
+              ++i;
+            }
+          }
+          
           return eerData.saveMatches(addedMatches)
             .then(function(res) {
               ++event.current_round;
