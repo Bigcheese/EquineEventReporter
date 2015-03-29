@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var browserSync = require('browser-sync');
 var del = require('del');
+var child_process = require('child_process');
     
 gulp.task('lint', function() {
   return gulp.src("app/**/*.js")
@@ -47,6 +48,21 @@ gulp.task('serve:dist', ['default'], function() {
   browserSync({
     server: ['dist']
   });
+});
+
+gulp.task('serve:user', ['default'], function() {
+  $.connect.server({
+    port: 3000,
+    root: 'dist'
+  });
+});
+
+gulp.task('mwm', function() {
+  child_process.spawn('python', ['server/max_weight_matching.py'],
+                      {stdio: 'inherit'})
+    .on('error', function(error) {
+      console.log(error);
+    });
 });
 
 gulp.task('default', ['clean', 'lint', 'html']);
