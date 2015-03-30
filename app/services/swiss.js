@@ -78,7 +78,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       return isNaN(ret) ? 0 : ret;
     },
     matchRank: function(match) {
-      if (match.players[1] === 'bye')
+      if (match.players[1] === null)
         return [0, 0];
       var p1 = eerData.data.players[match.players[0]];
       var p2 = eerData.data.players[match.players[1]];
@@ -210,6 +210,10 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
           
           // Sort matches and assign tables.
           addedMatches.sort(function(a, b) {
+            if (a.players[1] === null)
+              return 1;
+            if (b.players[1] === null)
+              return -1;
             if (a.rank[0] !== b.rank[0])
               return b.rank[0] - a.rank[0];
             if (a.rank[1] !== b.rank[1])
