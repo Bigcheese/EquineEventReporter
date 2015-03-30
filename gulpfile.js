@@ -26,7 +26,8 @@ gulp.task('html', function() {
     // minifiy JavaScript.
     .pipe($.if("*.js", $.uglify()))
     .pipe($.if("*.css", $.uncss({
-      html: ['app/**/*.html']
+      html: ['app/**/*.html'],
+      ignore: [/.label.*/]
     })))
     .pipe($.if("*.css", $.csso()))
     .pipe(assets.restore())
