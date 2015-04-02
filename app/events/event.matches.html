@@ -10,14 +10,21 @@
         ng-repeat="match in model.matches | toArray | filter:matches_filter | orderBy:['-round', 'table']">
     <span ng-click="saveMatch(match)">
       Round: {{match.round}} - Table {{match.table}} -
+
+      <span ng-class="{'label label-success': match.first === match.players[0]}"
+            ng-click="match.first = match.players[0]"
+        >1<sup>st</sup></span>
       <span ng-class="{'label label-success': match.winner === match.players[0]}"
             ng-click="match.winner = match.players[0]"
         >{{model.players[match.players[0]].name}}</span>
       <span ng-hide="match.players[1] === null">
-        <span ng-click="match.winner = 'tie'">vs.</span>
+        <span ng-class="{'label label-success': match.winner === 'tie'}" ng-click="match.winner = 'tie'">vs.</span>
         <span ng-class="{'label label-success': match.winner === match.players[1]}"
               ng-click="match.winner = match.players[1]"
           >{{model.players[match.players[1]].name}}</span>
+        <span ng-class="{'label label-success': match.first === match.players[1]}"
+              ng-click="match.first = match.players[1]"
+          >1<sup>st</sup></span>
       </span>
     </span>
     <button type="button" class="btn btn-default btn-sm pull-right"

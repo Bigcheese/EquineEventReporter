@@ -119,6 +119,17 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
       this.name = "";
     };
     
+    $scope.mergeEvents = function(name, event1, event2) {
+      if (this.name === undefined || this.name === "")
+        return;
+
+      eerData.mergeEvents(this.name, [this.event1, this.event2]);
+
+      this.name = "";
+      this.event1 = "";
+      this.event2 = "";
+    };
+    
     $scope.removeEvent = function(event) {
       return eerData.removeEvent(event);
     };
@@ -193,8 +204,8 @@ var app = angular.module('eer', ['ui.router', 'angular-toArrayFilter', 'edmons',
       };
       
       $scope.comparePlayer = function(a) {
-        var mp = $scope.model.swiss.matchPoints(a);
-        var omwp = $scope.model.swiss.opponentsMatchWinPercentage(a);
+        var mp = $scope.model.swiss.matchPoints($scope.model.event, a);
+        var omwp = $scope.model.swiss.opponentsMatchWinPercentage($scope.model.event, a);
         return mp + omwp;
       };
 

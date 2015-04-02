@@ -293,7 +293,48 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       return ret;
     };
     
+    self.mergeEvents = function(name, events) {
+      var newEvent = {
+        _id: 'event.' + Date.now() + uuid(),
+        type: 'event',
+        name: name,
+        current_round: 1,
+        players: [],
+        done: false,
+        eventType: "swiss"
+      };
+      
+      var promises = [];
+      
+      for (var i in events) {
+        var event = self.data.events[events[i]];
+        newEvent.current_round = Math.max(newEvent.current_round, event.current_round);
+        newEvent.players = newEvent.players.concat(event.players);
+        promises.push(self.loadMatches(event));
+      }
+      
+      promises.push(self.saveEvent(newEvent));
+      
+      return $q.all(promises).then(function() {
+        var newMatches = []
+        for (var i in events) {
+          var matches = self.getMatches(self.data.events[events[i]]);
+          for (var j in matches) {
+            var m = matches[j];
+            // Yeah, this is a bad way to copy an object. Oh well.
+            var newMatch = JSON.parse(JSON.stringify(m));
+            newMatch._id = "match." + uuid();
+            newMatch.event = newEvent._id;
+            newMatches.push(newMatch);
+          }
+        }
+        return self.saveMatches(newMatches)
+          .then(function() {
+            self.data.events[newEvent._id] = newEvent;
+          });
+      });
+    }
+    
     return self;
   }]);
-
 })();

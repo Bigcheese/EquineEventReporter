@@ -29,17 +29,18 @@ var Swiss = angular.module('Swiss', []);
 
 Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, edmons, eerData, uuid) {
   return {
-    playerMatches: function(player) {
+    playerMatches: function(event, player) {
       var ret = [];
-      for (var i in eerData.data.matches) {
-        var m = eerData.data.matches[i];
+      var matches = eerData.getMatches(event);
+      for (var i in matches) {
+        var m = matches[i];
         if (m.players.indexOf(player._id) !== -1)
           ret.push(m);
       }
       return ret;
     },
-    winLossTie: function(player) {
-      var matches = this.playerMatches(player);
+    winLossTie: function(event, player) {
+      var matches = this.playerMatches(event, player);
       return [
         $.grep(matches, function(match) {
           return match.winner === player._id;
@@ -54,12 +55,12 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         }).length
       ];
     },
-    matchPoints: function(player) {
-      var wlt = this.winLossTie(player);
+    matchPoints: function(event, player) {
+      var wlt = this.winLossTie(event, player);
       return (wlt[0] * 3) + wlt[1] + (wlt[2] * 2);
     },
-    opponentsMatchWinPercentage: function(player) {
-      var matches = this.playerMatches(player);
+    opponentsMatchWinPercentage: function(event, player) {
+      var matches = this.playerMatches(event, player);
       var totalOp = 0;
       var totalMatches = 0;
       var self = this;
@@ -70,8 +71,8 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         var opponent = m.players[0] === player._id ?
           eerData.data.players[m.players[1]] :
           eerData.data.players[m.players[0]];
-        totalOp += self.matchPoints(opponent) /
-          (self.playerMatches(opponent).length * 3);
+        totalOp += self.matchPoints(event, opponent) /
+          (self.playerMatches(event, opponent).length * 3);
         ++totalMatches;
       });
       var ret = totalOp / totalMatches;
@@ -82,9 +83,10 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
         return [0, 0];
       var p1 = eerData.data.players[match.players[0]];
       var p2 = eerData.data.players[match.players[1]];
-      var mpAvg = (this.matchPoints(p1) + this.matchPoints(p2)) / 2;
-      var omwpAvg = (this.opponentsMatchWinPercentage(p1) +
-                     this.opponentsMatchWinPercentage(p2)) / 2;
+      var mpAvg = (this.matchPoints(eerData.data.events[match.event], p1) +
+                   this.matchPoints(eerData.data.events[match.event], p2)) / 2;
+      var omwpAvg = (this.opponentsMatchWinPercentage(eerData.data.events[match.event], p1) +
+                     this.opponentsMatchWinPercentage(eerData.data.events[match.event], p2)) / 2;
       return [mpAvg, omwpAvg];
     },
     pair: function(event, pairNext) {
@@ -95,7 +97,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       for (var i in players) {
         if (players[i].dropped !== true && players[i].paid === true)
           ranked_players.push({
-            points: this.matchPoints(players[i]),
+            points: this.matchPoints(event, players[i]),
             player: players[i]
           });
       }
