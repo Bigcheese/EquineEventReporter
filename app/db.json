@@ -1,0 +1,16 @@
+{
+   "_id": "_design/eer",
+   "_rev": "1-66a8bbcbad97db8449251a7712ed313e",
+   "language": "javascript",
+   "views": {
+       "events": {
+           "map": "function(doc) {\n  if (doc.type === \"event\")\n    emit(null, doc);\n}"
+       },
+       "players": {
+           "map": "function(doc) {\n  if (doc.type === \"player\")\n    emit(doc._id, doc);\n}"
+       },
+       "matches": {
+           "map": "function(doc) {\n  if (doc.type === \"match\")\n    emit([doc.event], doc);\n}"
+       }
+   }
+}
