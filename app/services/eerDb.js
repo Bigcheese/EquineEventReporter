@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-var _dbPath = "http://127.0.0.1:5984/eer";
+var _dbPath = document.location.protocol + '//' + document.location.hostname + ':5984/eer'";
 var eerServices = angular.module('errServices', ['ngResource', 'eer.uuid']);
 
 function couchRowsToObjectById(rows, object) {
