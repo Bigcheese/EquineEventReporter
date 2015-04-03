@@ -177,7 +177,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
       }
       
       var self = this;
-      return $http.post("http://127.0.0.1:8156/", edgeList)
+      return $http.post(document.location.protocol + '//' + document.location.hostname + ':8156', edgeList)
         .then(function(res) {
           var match_pairs = res.data;
           // Failed to pair all players.
