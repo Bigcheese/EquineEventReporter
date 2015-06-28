@@ -156,15 +156,16 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
           var p2 = ranked_players[j];
           var weight = 0;
           var alreadyPlayedCount = playerIdToOpponents[p1.player._id][p2.player._id] === true ? 1 : 0;
-          // calculate pairing weight. higher is better.
-          var max = Math.max(p1.points, p2.points);
-          var min = Math.min(p1.points, p2.points);
-          // Base weight is the average of the two players
-          weight = (max + min) / 2;
-          // Give a pentalty based on the difference beetween them.
-          weight -= (max - min) / 10; // Why 10? No idea.
-          // Give moar pentalty if they've already played.
-          weight -= max * alreadyPlayedCount;
+          if (alreadyPlayedCount !== 0) {
+            weight = -9999999;
+          } else {
+            // calculate pairing weight. higher is better.
+            var max = Math.max(p1.points, p2.points);
+            var min = Math.min(p1.points, p2.points);
+            // Base weight is the average of the two players
+            weight = ((max + min) / 2) - ((max-min)*(max-min));
+            // console.log(weight,max,min);
+          }
           edgeList.push([i, j, weight]);
         }
       }

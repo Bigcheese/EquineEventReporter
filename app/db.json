@@ -1,6 +1,5 @@
 {
    "_id": "_design/eer",
-   "_rev": "1-66a8bbcbad97db8449251a7712ed313e",
    "language": "javascript",
    "views": {
        "events": {
