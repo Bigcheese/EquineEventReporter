@@ -1,0 +1,56 @@
+A quick and dirty setup guide:
+
+1. Get the source
+	git clone the repo
+
+2. Get prerequisites
+	Install couchdb to your system
+	Install npm to your system
+
+3. Pull web app components for EER
+	cd EquineEventReporter
+	npm install
+	node_modules/bower/bin/bower install
+
+4. Start EER
+	Start couchdb
+	./run_eer.sh
+	Open a browser to http://localhost:3000
+
+5. Warnings
+	This was written by a programmer for a programmer. There are sharp edges and pointy bits all over it.
+	There are no "undo" buttons. If you delete something, that's permanent. This can wreck the event to the point that you have to start a new one; see previous point.
+
+	You can access the site on a different machine than the one that's hosting it, but you really shouldn't - it's insecure.
+	Don't have the site open on more than one browser at a time. Doing this is asking for trouble.
+	Don't click on stuff quickly or you'll piss couch and/or the application off.
+
+	If the website isn't working, the local server is probably down.
+	If you get lots of red curly braces in the website, couch probably isn't running.
+	If everything but generating pairings is working, the mwm daemon probably isn't running.
+
+6. Use
+	Open the site and click on Events on the left
+	Type a name into the Add Event field and press the +
+	Click on the event below
+		This adds the Players, Matches and Matches - Slips links to the left menu; these are specific to the event you chose
+	Click Players on the left
+	Add players as necessary (at least 3)
+		EER won't pair people who haven't been marked as paid
+		If you aren't using EER to manage payments, check the paid box
+	Click Matches on the left
+		The default filter is something strange and we haven't bothered to fix this
+		Click one of the All/Current/Completed links if nothing is showing up
+	Click Pair Next Match
+		Note that one player has a bye (you might need to click All)
+	Click Matches - Slips on the left
+		Print this out if you want
+	Click Matches on the left
+		Click on one of the player names to track who won a match
+		Click on the '1st's to track who went first; this doesn't actually affect anything so you don't need to deal with it if you don't want to
+	Once everyone has reported, click Players on the left for standings
+		This shows you win/loss/draw, points, and tiebreakers
+		If somebody drops, click the checkbox and they won't be paired
+	Click Matches on the left
+	Click Pair Next Match
+	Etc
