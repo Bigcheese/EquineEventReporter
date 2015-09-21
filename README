@@ -1,0 +1,25 @@
+A quick and dirty setup guide:
+
+1. Get the source
+	git clone the repo
+
+2. Get prerequisites
+	Install couchdb to your system
+	Install npm to your system
+
+3. Pull web app components for EER
+	cd EquineEventReporter
+	npm install
+	node_modules/bower/bin/bower install
+
+4. Start EER
+	Start couchdb
+	./run_eer.sh
+	Open a browser to http://localhost:3000
+
+You can access the site on a different machine than the one that's hosting it, but you really shouldn't - it's twitchy and insecure.
+Don't click on stuff quickly or you'll piss couch and/or the application off.
+
+If the website isn't working, the local server is probably down.
+If you get lots of red curly braces in the website, couch probably isn't running.
+If everything but generating pairings is working, the mwm daemon probably isn't running.
