@@ -27,8 +27,7 @@
           >1<sup>st</sup></span>
       </span>
     </span>|
-<span>{{model.swiss.matchPoints(model.event, model.players[match.players[0]])}}</span> - 
-<span>{{model.swiss.matchPoints(model.event, model.players[match.players[1]])}}</span>
+<span>{{model.swiss.matchPoints(model.event, model.players[match.players[0]])}}</span><span ng-hide="match.players[1] === null"> - {{model.swiss.matchPoints(model.event, model.players[match.players[1]])}}</span>
     <button type="button" class="btn btn-default btn-sm pull-right"
             ng-click="removeMatch(match)">✖</button>
   </span>
