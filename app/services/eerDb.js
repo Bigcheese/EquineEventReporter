@@ -316,7 +316,7 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       promises.push(self.saveEvent(newEvent));
       
       return $q.all(promises).then(function() {
-        var newMatches = []
+        var newMatches = [];
         for (var i in events) {
           var matches = self.getMatches(self.data.events[events[i]]);
           for (var j in matches) {
@@ -333,7 +333,7 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
             self.data.events[newEvent._id] = newEvent;
           });
       });
-    }
+    };
     
     return self;
   }]);

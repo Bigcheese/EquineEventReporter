@@ -57,7 +57,7 @@ Swiss.factory('swiss', ['$http', 'edmons', 'eerData', 'uuid', function($http, ed
     },
     matchPoints: function(event, player) {
       var wlt = this.winLossTie(event, player);
-      return (wlt[0] * 3) + wlt[1] + (wlt[2] * 2);
+      return (wlt[0] * 3) + wlt[1] + (wlt[2] * 1);
     },
     opponentsMatchWinPercentage: function(event, player) {
       var matches = this.playerMatches(event, player);
