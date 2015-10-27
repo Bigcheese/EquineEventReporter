@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [[ `id -u` -ne 0 ]]; then
-	echo "I think this needs to be run as root"
-fi
-
 curl http://127.0.0.1:5984/ 2>&1 | grep 'Connection refused' > /dev/null
 if [[ $? -eq 0 ]]; then
 	echo "Couch doesn't appear to be running. Start it first"
