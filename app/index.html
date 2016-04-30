@@ -43,6 +43,8 @@
             <li ng-repeat="sub in $state.current.data.sidebar">
               <a ui-sref="{{sub.location}}" ui-sref-active="active">{{sub.name}}</a>
             </li>
+            <hr>
+            <li><a href="javascript:window.open('timer.html', 'Round timer', 'menubar=no,toolbar=no,scrollbars=no,status=no,directories=no,location=no');void(0)">Timer</a></li>
           </ul>
         </div>
       </div>
