@@ -7,7 +7,7 @@
   </head>
   <body>
 
-<div style="display: block; position: absolute; z-index: 10"><button id="30min">30 minutes</button> | <button id="45min">45 minutes</button> | <button id="stop">Stop</button></div>
+<div style="display: block; position: absolute; z-index: 10"><button id="30min">30 minutes</button> | <button id="45min">45 minutes</button> | <button id="stop">Stop</button> | <label><input type="checkbox" id="skipsetup" /> skip setup</label></div>
 <div style="display: table; position: absolute; height: 100%; width: 100%">
 <div style="display: table-cell; vertical-align: middle;">
     <div id="label" style="text-align: center; width: 100%;">EER Round Timer</div>
@@ -32,16 +32,17 @@ function resizeElements() {
 
 var timer = null;
 var timerStates = null;
+var noises = [];
+var activeNoise = null;
 
 function startTimer(states)
 {
-  if (!(timer === null))
+  if (timer === null)
   {
-    window.clearInterval(timer);
+    timerStates = states;
+    updateTimer();
+    timer = window.setInterval(onTimer, 500);
   }
-  timerStates = states;
-  updateTimer();
-  timer = window.setInterval(onTimer, 1000);
 }
 
 function updateTimer()
@@ -52,8 +53,17 @@ function updateTimer()
 
 function stopTimer()
 {
-  window.clearInterval(timer);
-  $("#timer").html(getText(0));
+  if (!(timer === null))
+  {
+    window.clearInterval(timer);
+    timer = null;
+    $("#timer").html(getText(0));
+  }
+  if (!(activeNoise === null))
+  {
+    noises[activeNoise].pause();
+    noises[activeNoise].currentTime = 0;
+  }
 }
 
 function onTimer() 
@@ -64,9 +74,12 @@ function onTimer()
 
   if (timeLeft <= 0)
   {
-    var noiseFile = timerStates[0]["noise"];
-    var noise = new Audio(noiseFile);
-    noise.play();
+    activeNoise = timerStates[0]["noise"]
+    if (noises[activeNoise] === undefined)
+    {
+      noises[activeNoise] = new Audio(activeNoise);
+    }
+    noises[activeNoise].play();
 
     if (timerStates.length == 1)
     {
@@ -95,21 +108,40 @@ $("#stop").click(function() {
   stopTimer();
 })
 
+function addSetup(states, curtime)
+{
+  if (document.getElementById("skipsetup").checked)
+  {
+    states.push({"label" : "Fast setup", "endtime" : curtime += 0, "noise" : "begin.wav"});
+  }
+  else
+  {
+    states.push({"label" : "Setup; round start in", "endtime" : curtime += 3*60*1000, "noise" : "begin.wav"});
+  }
+  return curtime;
+}
+
 $("#30min").click(function() {
   var curtime = Date.now();
-  startTimer([
-    {"label" : "Setup; round start in", "endtime" : curtime += 3*60*1000, "noise" : "begin.wav"},
-    {"label" : "Time remaining", "endtime" : curtime += 30*60*1000, "noise" : "over.wav"},
-    {"label" : "Hard time in", "endtime" : curtime += 10*60*1000, "noise" : "time.wav"}
-  ]);
+  var states = [];
+
+  curtime = addSetup(states, curtime);
+  
+  states.push({"label" : "Time remaining", "endtime" : curtime += 30*60*1000, "noise" : "over.wav"});
+  states.push({"label" : "Game ends in", "endtime" : curtime += 10*60*1000, "noise" : "time.wav"});
+  
+  startTimer(states);
 })
 
 $("#45min").click(function() {
   var curtime = Date.now();
-  startTimer([
-    {"label" : "Setup; round start in", "endtime" : curtime += 3*60*1000, "noise" : "begin.wav"},
-    {"label" : "Time remaining", "endtime" : curtime += 45*60*1000, "noise" : "over.wav"},
-  ]);
+  var states = [];
+ 
+  curtime = addSetup(states, curtime);
+
+  states.push({"label" : "Time remaining", "endtime" : curtime += 45*60*1000, "noise" : "over.wav"});
+
+  startTimer(states);
 })
 
     </script>
