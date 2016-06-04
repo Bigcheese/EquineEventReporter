@@ -37,6 +37,11 @@ gulp.task('html', function() {
     .pipe($.size({title: "html"}));
 });
 
+gulp.task('media', function() {
+  return gulp.src("app/*.wav")
+    .pipe(gulp.dest("dist"));
+});
+
 gulp.task('clean', del.bind(null, ['dist/*', '!dist/.git'], {dot: true}));
 
 gulp.task('serve', function() {
@@ -66,4 +71,4 @@ gulp.task('mwm', function() {
     });
 });
 
-gulp.task('default', ['clean', 'lint', 'html']);
+gulp.task('default', ['clean', 'lint', 'html', 'media']);

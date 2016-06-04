@@ -235,6 +235,7 @@ eerServices.factory('eerData', ['$resource', '$q', 'alertsManager', 'uuid',
       var player = {
         _id: "player." + uuid(),
         type: "player",
+        paid: true,
         name: name
       };
 
