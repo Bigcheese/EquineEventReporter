@@ -7,7 +7,7 @@
   </head>
   <body>
 
-<div style="display: block; position: absolute; z-index: 10"><button id="30min">30 minutes</button> | <button id="45min">45 minutes</button> | <button id="stop">Stop</button> | <label><input type="checkbox" id="skipsetup" /> skip setup</label></div>
+<div style="display: block; position: absolute; z-index: 10"><button id="35min">35 minutes</button> | <button id="45min">45 minutes</button> | <button id="stop">Stop</button> | <label><input type="checkbox" id="skipsetup" /> skip setup</label></div>
 <div style="display: table; position: absolute; height: 100%; width: 100%">
 <div style="display: table-cell; vertical-align: middle;">
     <div id="label" style="text-align: center; width: 100%;">EER Round Timer</div>
@@ -121,14 +121,14 @@ function addSetup(states, curtime)
   return curtime;
 }
 
-$("#30min").click(function() {
+$("#35min").click(function() {
   var curtime = Date.now();
   var states = [];
 
   curtime = addSetup(states, curtime);
   
-  states.push({"label" : "Time remaining", "endtime" : curtime += 30*60*1000, "noise" : "over.wav"});
-  states.push({"label" : "Game ends in", "endtime" : curtime += 10*60*1000, "noise" : "time.wav"});
+  states.push({"label" : "Time remaining", "endtime" : curtime += 35*60*1000, "noise" : "over.wav"});
+  states.push({"label" : "Game ends in", "endtime" : curtime += 5*60*1000, "noise" : "time.wav"});
   
   startTimer(states);
 })
