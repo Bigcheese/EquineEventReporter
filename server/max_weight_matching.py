@@ -1,3 +1,4 @@
+import sys
 import wsgiref
 from wsgiref.util import setup_testing_defaults
 from wsgiref.simple_server import make_server
@@ -31,7 +32,7 @@ def max_weight_matching(env, start_response):
     parings = nx.max_weight_matching(g, True)
     paired = set()
     out_pairings = []
-    for p1, p2 in parings.items():
+    for p1, p2 in parings:
       if p1 not in paired and p2 not in paired:
         paired.add(p1)
         paired.add(p2)
@@ -45,6 +46,7 @@ def max_weight_matching(env, start_response):
 def main():
   httpd = make_server('127.0.0.1', 8156, max_weight_matching)
   print("Serving on port 8156...")
+  sys.stdout.flush()
   httpd.serve_forever()
 
 if __name__ == "__main__":
