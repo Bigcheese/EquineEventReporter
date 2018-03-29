@@ -28,7 +28,7 @@
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="#about">About</a></li>
+            <li><a href="#print" onclick="printDiv('content');">Print</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
         </div><!--/.nav-collapse -->
@@ -59,7 +59,7 @@
             {{alert}}
           </div>
         </div>
-        <div ui-view>Loading...</div>
+        <div id="content" ui-view>Loading...</div>
       </div>
     </div>
 
