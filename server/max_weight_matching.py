@@ -7,7 +7,7 @@ import json
 
 def max_weight_matching(env, start_response):
   setup_testing_defaults(env)
-  
+
   # CORS
   if env['REQUEST_METHOD'] == 'OPTIONS':
     start_response('200 OK', [
@@ -17,7 +17,7 @@ def max_weight_matching(env, start_response):
       ('Content-Type', 'text/plain')
       ])
     return []
-    
+
   if env['REQUEST_METHOD'] == 'POST':
     try:
       request_body_size = int(env.get('CONTENT_LENGTH', 0))
@@ -38,7 +38,7 @@ def max_weight_matching(env, start_response):
         out_pairings.append([p1, p2])
     start_response('200 OK', [('Access-Control-Allow-Origin', '*'), ('Content-type', 'text/html')])
     return [json.dumps(out_pairings).encode('utf-8')]
-  
+
   start_response('200 OK', [('Access-Control-Allow-Origin', '*'), ('Content-type', 'text/html')])
   return [json.dumps([]).encode('utf-8')]
 
