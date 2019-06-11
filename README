@@ -22,6 +22,7 @@ A quick and dirty setup guide:
 	There are no "undo" buttons. If you delete something, that's permanent. This can wreck the event to the point that you have to start a new one; see previous point.
 
 	You can access the site on a different machine than the one that's hosting it, but you really shouldn't - it's insecure.
+		If you really want to do this, you'll need to poke some holes in the firewall for ports 3000 (EER web), 5984 (couch) and 8156 (pairing service)
 	Don't have the site open on more than one browser at a time. Doing this is asking for trouble.
 	Don't click on stuff quickly or you'll piss couch and/or the application off.
 
