@@ -1,0 +1,15 @@
+<h3>Standings</h3>
+<span ng-repeat="player in model.players | toArray | orderBy:[comparePlayer, _id]:'True'">
+#{{$index+1}} - {{player.name}} {{model.swiss.winLossTie(model.event, player)}} - {{model.swiss.matchPoints(model.event, player)}} pts - {{model.swiss.opponentsMatchWinPercentage(model.event, player).toFixed(4)}}%<br />
+</span>
+<br />
+<h3>Matches</h3>
+@Participant - Round {{model.event.current_round - 1}} pairings<br />
+<span ng-repeat="match in model.matches | toArray | filter:{round: model.event.current_round - 1} | orderBy:['-round', 'table']">
+Table #{{match.table}} - {{model.players[match.players[0]].name}} {{model.swiss.winLossTie(model.event, model.players[match.players[0]])}} vs {{model.players[match.players[1]].name}} {{model.swiss.winLossTie(model.event, model.players[match.players[1]])}}<br />
+</span>
+<br />
+<h3>Challonge formatted table</h3>
+<span ng-repeat="player in model.players | toArray | orderBy:[comparePlayer, _id]:'True'">
+{{$index+1}}|{{player.name}}|{{model.swiss.winLossTie(model.event, player).join(' - ')}}|0|{{model.swiss.matchPoints(model.event, player)}}|0|{{model.swiss.opponentsMatchWinPercentage(model.event, player).toFixed(4)}}|0<br />
+</span>
