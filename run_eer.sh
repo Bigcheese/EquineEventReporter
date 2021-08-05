@@ -6,11 +6,11 @@ if [[ $? -eq 0 ]]; then
 	exit 1
 fi
 
-curl http://127.0.0.1:5984/eer | grep 'not_found' > /dev/null 2>&1
+curl http://admin:admin@127.0.0.1:5984/eer | grep 'not_found' > /dev/null 2>&1
 if [[ $? -eq 0 ]]; then
 	echo "Couch doesn't seem to have the EER database. Making it..."
-	curl -X PUT http://127.0.0.1:5984/eer
-	curl -X PUT http://127.0.0.1:5984/eer/_design/eer -d @app/db.json
+	curl -X PUT http://admin:admin@127.0.0.1:5984/eer
+	curl -X PUT http://admin:admin@127.0.0.1:5984/eer/_design/eer -d @app/db.json
 fi
 
 gulp mwm &

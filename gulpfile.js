@@ -65,7 +65,7 @@ gulp.task('serve:user', gulp.series('default', function() {
 }));
 
 gulp.task('mwm', function() {
-  child_process.spawn('python', ['server/max_weight_matching.py'],
+  child_process.spawn('python3', ['server/max_weight_matching.py'],
                       {stdio: 'inherit'})
     .on('error', function(error) {
       console.log(error);
