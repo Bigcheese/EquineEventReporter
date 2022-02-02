@@ -44,7 +44,7 @@ def max_weight_matching(env, start_response):
   return [json.dumps([]).encode('utf-8')]
 
 def main():
-  httpd = make_server('127.0.0.1', 8156, max_weight_matching)
+  httpd = make_server('0.0.0.0', 8156, max_weight_matching)
   print("Serving on port 8156...")
   sys.stdout.flush()
   httpd.serve_forever()

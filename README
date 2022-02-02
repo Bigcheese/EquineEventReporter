@@ -6,15 +6,18 @@ A quick and dirty setup guide:
 2. Get prerequisites
 	Install couchdb to your system
 	Install npm to your system
+	Install gulp to your system
+	Install python3-pip to your system
 
 3. Pull web app components for EER
 	cd EquineEventReporter
 	npm install
 	node_modules/bower/bin/bower install
+	[sudo] pip3 install -f server/requirements.txt
 
 4. Start EER
 	Start couchdb
-	./run_eer.sh
+	./run_eer.sh (this expects an admin account with creds admin:admin by default)
 	Open a browser to http://localhost:3000
 
 5. Warnings
@@ -22,6 +25,7 @@ A quick and dirty setup guide:
 	There are no "undo" buttons. If you delete something, that's permanent. This can wreck the event to the point that you have to start a new one; see previous point.
 
 	You can access the site on a different machine than the one that's hosting it, but you really shouldn't - it's insecure.
+		If you really want to do this, you'll need to poke some holes in the firewall for ports 3000 (EER web), 5984 (couch) and 8156 (pairing service) and adjust Couch's interface bindings
 	Don't have the site open on more than one browser at a time. Doing this is asking for trouble.
 	Don't click on stuff quickly or you'll piss couch and/or the application off.
 

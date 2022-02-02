@@ -60,12 +60,13 @@ gulp.task('serve:dist', gulp.series('default', function() {
 gulp.task('serve:user', gulp.series('default', function() {
   connect.server({
     port: 3000,
+    host: '0.0.0.0',
     root: 'dist'
   });
 }));
 
 gulp.task('mwm', function() {
-  child_process.spawn('python', ['server/max_weight_matching.py'],
+  child_process.spawn('python3', ['server/max_weight_matching.py'],
                       {stdio: 'inherit'})
     .on('error', function(error) {
       console.log(error);
