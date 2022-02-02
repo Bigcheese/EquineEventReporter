@@ -60,6 +60,7 @@ gulp.task('serve:dist', gulp.series('default', function() {
 gulp.task('serve:user', gulp.series('default', function() {
   connect.server({
     port: 3000,
+    host: '0.0.0.0',
     root: 'dist'
   });
 }));
